@@ -9,10 +9,10 @@ REM Configuration
 set SERVICE_NAME=SimpleUtcd
 set SERVICE_DISPLAY_NAME=Simple UTC Daemon
 set SERVICE_DESCRIPTION=Provides UTC time coordinate services
-set BINARY_PATH=%~dp0simple-utcd-service.exe
-set CONFIG_DIR=%ProgramData%\SimpleUtcd
-set LOG_DIR=%ProgramData%\SimpleUtcd\logs
-set DATA_DIR=%ProgramData%\SimpleUtcd\data
+set BINARY_PATH=%~dp0simple-utcd-servtcice.exe
+set CONFIG_DIR=%ProgramData%\Simple-UTCd
+set LOG_DIR=%ProgramData%\Simple-UTCd\logs
+set DATA_DIR=%ProgramData%\Simple-UTCd\data
 
 REM Check if running as administrator
 net session >nul 2>&1

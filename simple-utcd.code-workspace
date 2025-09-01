@@ -3,10 +3,6 @@
 		{
 			"name": "simple-utcd",
 			"path": "."
-		},
-		{
-			"name": "simple-ntpd",
-			"path": "../../Apps/simple-ntpd"
 		}
 	],
 	"settings": {

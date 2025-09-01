@@ -8,7 +8,7 @@ param(
     [string]$Action = "help",
 
     [Parameter()]
-    [string]$ServiceName = "SimpleUtcd",
+    [string]$ServiceName = "Simple-UTCd",
 
     [Parameter()]
     [string]$DisplayName = "Simple UTC Daemon",
@@ -20,13 +20,13 @@ param(
     [string]$BinaryPath = "$PSScriptRoot\simple-utcd-service.exe",
 
     [Parameter()]
-    [string]$ConfigDir = "$env:ProgramData\SimpleUtcd",
+    [string]$ConfigDir = "$env:ProgramData\Simple-UTCd",
 
     [Parameter()]
-    [string]$LogDir = "$env:ProgramData\SimpleUtcd\logs",
+    [string]$LogDir = "$env:ProgramData\Simple-UTCd\logs",
 
     [Parameter()]
-    [string]$DataDir = "$env:ProgramData\SimpleUtcd\data"
+    [string]$DataDir = "$env:ProgramData\Simple-UTCd\data"
 )
 
 # Set strict error handling

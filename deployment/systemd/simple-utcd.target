@@ -1,0 +1,9 @@
+[Unit]
+Description=Simple UTC Daemon Target
+Documentation=man:simple-utcd(8)
+Requires=simple-utcd.service
+Wants=simple-utcd.socket
+After=simple-utcd.service simple-utcd.socket
+
+[Install]
+WantedBy=multi-user.target

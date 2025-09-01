@@ -1,0 +1,59 @@
+[Unit]
+Description=Simple UTC Daemon
+Documentation=man:simple-utcd(8)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/simple-utcd -c /etc/simple-utcd/simple-utcd.conf
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=3
+User=utc
+Group=utc
+RuntimeDirectory=simple-utcd
+RuntimeDirectoryMode=0755
+StateDirectory=simple-utcd
+StateDirectoryMode=0755
+LogDirectory=simple-utcd
+LogDirectoryMode=0755
+PIDFile=/run/simple-utcd/simple-utcd.pid
+LimitNOFILE=65536
+LimitNPROC=4096
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/simple-utcd /var/log/simple-utcd
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service @clock @network-io @basic-io @chown @setuid @memlock @keyring @timer @cpu-emulation @debug @obsolete @privileged @resources
+SystemCallErrorNumber=EPERM
+IPAddressDeny=
+IPAddressAllow=localhost
+IPAddressAllow=127.0.0.1
+IPAddressAllow=::1
+IPAddressAllow=0.0.0.0/0
+IPAddressAllow=::/0
+
+[Install]
+WantedBy=multi-user.target
+Also=simple-utcd.socket
+
+# Socket activation
+[Socket]
+ListenDatagram=37
+BindIPv6Only=both
+SocketUser=utc
+SocketGroup=utc
+SocketMode=0644

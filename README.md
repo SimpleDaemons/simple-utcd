@@ -1,1 +1,1 @@
-# Simple UTC Daemon
+# Simple UTC Daemon [simple-utcd]

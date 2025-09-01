@@ -190,7 +190,7 @@ make service-stop
 ### Platform Support
 
 - **macOS**: launchd service
-- **Linux**: systemd service  
+- **Linux**: systemd service
 - **Windows**: Windows Service
 
 ## Configuration

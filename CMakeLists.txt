@@ -24,11 +24,11 @@ elseif(UNIX AND NOT APPLE)
 elseif(WIN32)
     set(PLATFORM_WINDOWS TRUE)
     message(STATUS "Building for Windows")
-    
+
     # Windows-specific settings
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
-    
+
     # Set Windows SDK version if available
     if(DEFINED ENV{WINDOWS_SDK_VERSION})
         set(CMAKE_SYSTEM_VERSION $ENV{WINDOWS_SDK_VERSION})
@@ -57,9 +57,9 @@ if(PLATFORM_MACOS)
     find_library(SECURITY_FRAMEWORK Security)
     find_library(CORE_FOUNDATION_FRAMEWORK CoreFoundation)
     find_library(SYSTEM_CONFIGURATION_FRAMEWORK SystemConfiguration)
-    
+
     # macOS doesn't need separate socket or rt libraries
-    set(PLATFORM_LIBRARIES 
+    set(PLATFORM_LIBRARIES
         ${SECURITY_FRAMEWORK}
         ${CORE_FOUNDATION_FRAMEWORK}
         ${SYSTEM_CONFIGURATION_FRAMEWORK}
@@ -188,13 +188,13 @@ if(PLATFORM_MACOS)
     set(CPACK_PACKAGE_FILE_NAME "simple-utcd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
     set(CPACK_DMG_VOLUME_NAME "simple-utcd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
     set(CPACK_DMG_FORMAT "UDZO")
-    
+
     # PKG configuration
     set(CPACK_PRODUCTBUILD_PACKAGE_NAME "simple-utcd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
     set(CPACK_PRODUCTBUILD_PACKAGE_VERSION "${PROJECT_VERSION}")
     set(CPACK_PRODUCTBUILD_PACKAGE_DESCRIPTION "Simple UTC Daemon for macOS - ${SYSTEM_ARCH}")
     set(CPACK_PRODUCTBUILD_PACKAGE_VENDOR "simple-utcd")
     set(CPACK_PRODUCTBUILD_PACKAGE_CONTACT "contact@blburns.com")
-    
+
     include(CPack)
 endif()

@@ -1,7 +1,27 @@
+/*
+ * src/core/utc_server.cpp
+ *
+ * Copyright 2024 SimpleDaemons
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "simple_utcd/utc_server.hpp"
 #include "simple_utcd/utc_connection.hpp"
 #include "simple_utcd/utc_packet.hpp"
 #include "simple_utcd/platform.hpp"
+#include "simple_utcd/error_handler.hpp"
+#include <mutex>
 #include <thread>
 #include <chrono>
 #include <sys/socket.h>
@@ -49,40 +69,38 @@ bool UTCServer::start() {
         }
         return false;
     }
-    
+
     if (!config_) {
-        if (logger_) {
-            logger_->error("No configuration provided");
-        }
+        UTC_ERROR("UTCServer", "No configuration provided");
         return false;
     }
-    
+
     // Create server socket
     if (!create_server_socket()) {
         return false;
     }
-    
+
     running_ = true;
-    
+
     if (logger_) {
-        logger_->info("Starting UTC Server on {}:{}", 
+        logger_->info("Starting UTC Server on {}:{}",
                      config_->get_listen_address(), config_->get_listen_port());
     }
-    
+
     // Start worker threads
     int num_threads = config_->get_worker_threads();
     for (int i = 0; i < num_threads; ++i) {
         worker_threads_.emplace_back(&UTCServer::worker_thread_main, this);
     }
-    
+
     // Start accepting connections
     std::thread accept_thread(&UTCServer::accept_connections, this);
     accept_thread.detach();
-    
+
     if (logger_) {
         logger_->info("UTC Server started successfully with {} worker threads", num_threads);
     }
-    
+
     return true;
 }
 
@@ -90,16 +108,16 @@ void UTCServer::stop() {
     if (!running_) {
         return;
     }
-    
+
     if (logger_) {
         logger_->info("Stopping UTC Server...");
     }
-    
+
     running_ = false;
-    
+
     // Close server socket
     close_server_socket();
-    
+
     // Close all connections
     {
         std::lock_guard<std::mutex> lock(connections_mutex_);
@@ -110,7 +128,7 @@ void UTCServer::stop() {
         }
         connections_.clear();
     }
-    
+
     // Wait for worker threads to finish
     for (auto& thread : worker_threads_) {
         if (thread.joinable()) {
@@ -118,7 +136,7 @@ void UTCServer::stop() {
         }
     }
     worker_threads_.clear();
-    
+
     if (logger_) {
         logger_->info("UTC Server stopped");
     }
@@ -128,16 +146,14 @@ void UTCServer::accept_connections() {
     while (running_) {
         std::string client_address;
         int client_fd = Platform::accept_connection(server_socket_, client_address);
-        
+
         if (client_fd < 0) {
             if (running_) {
-                if (logger_) {
-                    logger_->error("Failed to accept connection: {}", Platform::get_last_error());
-                }
+                UTC_ERROR("UTCServer", "Failed to accept connection: " + Platform::get_last_error());
             }
             continue;
         }
-        
+
         // Check connection limit
         if (active_connections_ >= config_->get_max_connections()) {
             if (logger_) {
@@ -146,21 +162,21 @@ void UTCServer::accept_connections() {
             Platform::close_socket(client_fd);
             continue;
         }
-        
+
         // Create connection object
         auto connection = std::make_unique<UTCConnection>(client_fd, client_address, config_, logger_);
-        
+
         // Add to connections list
         {
             std::lock_guard<std::mutex> lock(connections_mutex_);
             connections_.push_back(std::move(connection));
         }
-        
+
         active_connections_++;
         total_connections_++;
-        
+
         if (logger_) {
-            logger_->debug("Accepted connection from {} (active: {})", 
+            logger_->debug("Accepted connection from {} (active: {})",
                           client_address, active_connections_);
         }
     }
@@ -170,15 +186,15 @@ void UTCServer::handle_connection(std::unique_ptr<UTCConnection> connection) {
     if (!connection) {
         return;
     }
-    
+
     // Send current UTC time to client
     UTCPacket packet(get_utc_timestamp());
-    
+
     if (connection->send_packet(packet)) {
         packets_sent_++;
-        
+
         if (logger_) {
-            logger_->debug("Sent UTC time to {}: {}", 
+            logger_->debug("Sent UTC time to {}: {}",
                           connection->get_client_address(), packet.to_string());
         }
     } else {
@@ -186,10 +202,10 @@ void UTCServer::handle_connection(std::unique_ptr<UTCConnection> connection) {
             logger_->warn("Failed to send UTC time to {}", connection->get_client_address());
         }
     }
-    
+
     // Close connection after sending (UTC protocol is typically one-shot)
     connection->close_connection();
-    
+
     // Remove from connections list
     {
         std::lock_guard<std::mutex> lock(connections_mutex_);
@@ -201,14 +217,14 @@ void UTCServer::handle_connection(std::unique_ptr<UTCConnection> connection) {
             connections_.erase(it);
         }
     }
-    
+
     active_connections_--;
 }
 
 void UTCServer::worker_thread_main() {
     while (running_) {
         std::unique_ptr<UTCConnection> connection;
-        
+
         // Get next connection to handle
         {
             std::lock_guard<std::mutex> lock(connections_mutex_);
@@ -217,7 +233,7 @@ void UTCServer::worker_thread_main() {
                 connections_.erase(connections_.begin());
             }
         }
-        
+
         if (connection) {
             handle_connection(std::move(connection));
         } else {
@@ -231,12 +247,10 @@ bool UTCServer::create_server_socket() {
     // Create socket
     server_socket_ = Platform::create_socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket_ < 0) {
-        if (logger_) {
-            logger_->error("Failed to create server socket: {}", Platform::get_last_error());
-        }
+        UTC_ERROR("UTCServer", "Failed to create server socket: " + Platform::get_last_error());
         return false;
     }
-    
+
     // Set socket options
     int reuse = 1;
     if (!Platform::set_socket_option(server_socket_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse))) {
@@ -244,27 +258,23 @@ bool UTCServer::create_server_socket() {
             logger_->warn("Failed to set SO_REUSEADDR: {}", Platform::get_last_error());
         }
     }
-    
+
     // Bind socket
     if (!Platform::bind_socket(server_socket_, config_->get_listen_address(), config_->get_listen_port())) {
-        if (logger_) {
-            logger_->error("Failed to bind socket: {}", Platform::get_last_error());
-        }
+        UTC_ERROR("UTCServer", "Failed to bind socket: " + Platform::get_last_error());
         Platform::close_socket(server_socket_);
         server_socket_ = -1;
         return false;
     }
-    
+
     // Listen for connections
     if (!Platform::listen_socket(server_socket_, config_->get_max_connections())) {
-        if (logger_) {
-            logger_->error("Failed to listen on socket: {}", Platform::get_last_error());
-        }
+        UTC_ERROR("UTCServer", "Failed to listen on socket: " + Platform::get_last_error());
         Platform::close_socket(server_socket_);
         server_socket_ = -1;
         return false;
     }
-    
+
     return true;
 }
 

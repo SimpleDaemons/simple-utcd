@@ -14,16 +14,24 @@ A lightweight, high-performance UTC (Universal Time Coordinate) daemon written i
 
 ### Using Docker (Recommended)
 
-```bash
-# Build for all platforms
-./scripts/build-docker.sh -d all
+The fastest way to get started is with Docker:
 
-# Run the UTC daemon
-docker-compose --profile runtime up simple-utcd
+```bash
+# Quick deployment
+cd deployment/examples/docker
+docker-compose up -d
 
 # Development environment
 docker-compose --profile dev up dev
+
+# Build for all platforms
+./scripts/build-docker.sh -d all
+
+# Deploy with custom settings
+./scripts/deploy-docker.sh -p runtime -c ./config -l ./logs
 ```
+
+For more Docker options, see the [Docker Deployment Guide](docs/deployment/docker.md).
 
 ### Local Development
 
@@ -70,8 +78,11 @@ The Docker setup supports multiple Linux distributions and architectures:
 
 - **Distributions**: Ubuntu, CentOS, Alpine Linux
 - **Architectures**: x86_64, arm64, armv7
+- **Multi-stage builds** for optimized production images
+- **Health checks** and monitoring capabilities
+- **Volume mounts** for configuration and logs
 
-### Build Profiles
+### Quick Docker Commands
 
 ```bash
 # Development environment
@@ -100,6 +111,21 @@ Use the build script for automated cross-platform building:
 # Clean build cache
 ./scripts/build-docker.sh --clean
 ```
+
+### Deployment Scripts
+
+```bash
+# Deploy runtime environment
+./scripts/deploy-docker.sh -p runtime
+
+# Deploy development environment
+./scripts/deploy-docker.sh -p dev
+
+# Force rebuild and deploy
+./scripts/deploy-docker.sh --clean --force
+```
+
+For comprehensive Docker documentation, see [Docker Deployment Guide](docs/deployment/docker.md).
 
 ## Development
 

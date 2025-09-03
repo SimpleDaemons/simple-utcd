@@ -11,6 +11,55 @@ Simple UTC Daemon can be deployed in multiple ways depending on your requirement
 - **Containerized**: Docker and Kubernetes deployments
 - **Cloud**: AWS, Azure, GCP deployments
 
+## Docker Deployment (Recommended)
+
+For most use cases, Docker deployment is the recommended approach:
+
+### Quick Start with Docker
+
+```bash
+# Navigate to Docker examples
+cd deployment/examples/docker
+
+# Create configuration directory
+mkdir -p config logs
+cp ../../config/examples/simple/simple-utcd.conf.example config/simple-utcd.conf
+
+# Start the service
+docker-compose up -d
+
+# Check status
+docker-compose ps
+```
+
+### Docker Features
+
+- **Multi-stage builds** for optimized production images
+- **Multi-platform support** (Ubuntu, CentOS, Alpine)
+- **Multi-architecture builds** (x86_64, ARM64, ARMv7)
+- **Development environment** with debugging tools
+- **Health checks** and monitoring
+- **Volume mounts** for configuration and logs
+- **Automated build scripts** for cross-platform building
+
+### Docker Commands
+
+```bash
+# Development environment
+docker-compose --profile dev up dev
+
+# Runtime environment
+docker-compose --profile runtime up simple-utcd
+
+# Build for all distributions
+./scripts/build-docker.sh -d all
+
+# Deploy with custom settings
+./scripts/deploy-docker.sh -p runtime -c ./config -l ./logs
+```
+
+For comprehensive Docker documentation, see [Docker Deployment Guide](docker.md).
+
 ## Deployment Strategies
 
 ### Single Instance Deployment
@@ -70,7 +119,7 @@ server {
 check_utc_server() {
     local host=$1
     local port=$2
-    
+
     if nc -z $host $port; then
         echo "✅ $host:$port is healthy"
         return 0
@@ -88,58 +137,71 @@ check_utc_server 192.168.1.12 37
 
 ### Containerized Deployment
 
-#### Docker
-```dockerfile
-FROM ubuntu:20.04
+#### Docker (Multi-stage Build)
+The project includes a comprehensive multi-stage Dockerfile supporting multiple distributions and architectures:
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+```bash
+# Build for specific distribution
+docker-compose --profile build build build-ubuntu
+docker-compose --profile build build build-centos
+docker-compose --profile build build build-alpine
 
-# Copy binary
-COPY simple-utcd /usr/local/bin/
-RUN chmod +x /usr/local/bin/simple-utcd
-
-# Create user
-RUN useradd -r -s /bin/false -d /var/lib/simple-utcd simple-utcd
-
-# Create directories
-RUN mkdir -p /etc/simple-utcd /var/log/simple-utcd /var/lib/simple-utcd
-RUN chown -R simple-utcd:simple-utcd /var/log/simple-utcd /var/lib/simple-utcd
-
-# Copy configuration
-COPY config/examples/simple/simple-utcd.conf.example /etc/simple-utcd/simple-utcd.conf
-
-# Expose port
-EXPOSE 37/udp 37/tcp
-
-# Run as non-root user
-USER simple-utcd
-
-# Start daemon
-CMD ["simple-utcd", "-c", "/etc/simple-utcd/simple-utcd.conf"]
+# Build for all distributions
+./scripts/build-docker.sh -d all
 ```
 
-#### Docker Compose
+#### Docker Compose (Production)
 ```yaml
 version: '3.8'
 
 services:
   simple-utcd:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
     ports:
-      - "37:37/udp"
       - "37:37/tcp"
     volumes:
       - ./config:/etc/simple-utcd:ro
       - ./logs:/var/log/simple-utcd
+    environment:
+      - SIMPLE_UTCD_LOG_LEVEL=INFO
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "37"]
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - utc-network
+
+networks:
+  utc-network:
+    driver: bridge
+```
+
+#### Docker Compose (Development)
+```yaml
+version: '3.8'
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - .:/app
+      - build-cache:/app/build
+    ports:
+      - "37:37/tcp"
+    environment:
+      - PLATFORM=linux
+      - DISTRO=ubuntu
+    command: /bin/bash
+    profiles:
+      - dev
 ```
 
 #### Kubernetes
@@ -249,25 +311,25 @@ stats_interval = 60
 check_utc_health() {
     local host=${1:-localhost}
     local port=${2:-37}
-    
+
     # Check if service is running
     if ! pgrep -f simple-utcd > /dev/null; then
         echo "❌ Simple UTC Daemon process not running"
         return 1
     fi
-    
+
     # Check if port is listening
     if ! nc -z $host $port; then
         echo "❌ Port $port not listening"
         return 1
     fi
-    
+
     # Check if service responds
     if ! timeout 5 bash -c "echo '' | nc $host $port" > /dev/null; then
         echo "❌ Service not responding"
         return 1
     fi
-    
+
     echo "✅ Simple UTC Daemon is healthy"
     return 0
 }
@@ -279,16 +341,16 @@ check_utc_health() {
 # Collect metrics
 collect_metrics() {
     local log_file="/var/log/simple-utcd/simple-utcd.log"
-    
+
     # Count connections
     local connections=$(grep "New connection" $log_file | wc -l)
-    
+
     # Count errors
     local errors=$(grep "ERROR" $log_file | wc -l)
-    
+
     # Get uptime
     local uptime=$(ps -o etime= -p $(pgrep simple-utcd) | tr -d ' ')
-    
+
     echo "connections_total $connections"
     echo "errors_total $errors"
     echo "uptime_seconds $uptime"
@@ -301,13 +363,13 @@ collect_metrics() {
 # Monitor logs for issues
 monitor_logs() {
     local log_file="/var/log/simple-utcd/simple-utcd.log"
-    
+
     # Monitor for errors
     tail -f $log_file | grep --line-buffered "ERROR" | while read line; do
         echo "🚨 ERROR detected: $line"
         # Send alert (email, Slack, etc.)
     done
-    
+
     # Monitor for high connection counts
     tail -f $log_file | grep --line-buffered "connection" | while read line; do
         if [[ $line =~ "active: ([0-9]+)" ]]; then
@@ -365,15 +427,15 @@ ssl_ca = /etc/ssl/certs/ca.crt
 backup_config() {
     local backup_dir="/var/backups/simple-utcd"
     local timestamp=$(date +%Y%m%d_%H%M%S)
-    
+
     mkdir -p $backup_dir
-    
+
     # Backup configuration
     cp /etc/simple-utcd/simple-utcd.conf $backup_dir/simple-utcd.conf.$timestamp
-    
+
     # Backup logs
     cp /var/log/simple-utcd/simple-utcd.log $backup_dir/simple-utcd.log.$timestamp
-    
+
     # Keep only last 30 days
     find $backup_dir -name "*.conf.*" -mtime +30 -delete
     find $backup_dir -name "*.log.*" -mtime +30 -delete
@@ -387,16 +449,16 @@ backup_config() {
 disaster_recovery() {
     # Stop service
     sudo systemctl stop simple-utcd
-    
+
     # Restore configuration
     cp /var/backups/simple-utcd/simple-utcd.conf.latest /etc/simple-utcd/simple-utcd.conf
-    
+
     # Restore logs
     cp /var/backups/simple-utcd/simple-utcd.log.latest /var/log/simple-utcd/simple-utcd.log
-    
+
     # Start service
     sudo systemctl start simple-utcd
-    
+
     # Verify
     sleep 5
     if systemctl is-active --quiet simple-utcd; then
@@ -474,10 +536,11 @@ nc -zv localhost 37
 
 ## Next Steps
 
+- **Docker Deployment**: See [Docker Deployment Guide](docker.md) for comprehensive Docker setup
 - **Production Setup**: See [Production Setup Guide](production.md)
 - **Examples**: See [Deployment Examples](../examples/deployment.md)
 - **Troubleshooting**: See [Troubleshooting Guide](../troubleshooting/README.md)
 
 ---
 
-*Next: [Production Setup Guide](production.md) for enterprise-grade deployment*
+*Next: [Docker Deployment Guide](docker.md) for containerized deployment or [Production Setup Guide](production.md) for enterprise-grade deployment*

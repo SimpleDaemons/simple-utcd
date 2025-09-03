@@ -312,45 +312,45 @@ bool Platform::daemonize() {
 #else
     // Modern daemon implementation using fork() instead of deprecated daemon()
     pid_t pid = fork();
-    
+
     if (pid < 0) {
         return false; // Fork failed
     }
-    
+
     if (pid > 0) {
         exit(0); // Parent process exits
     }
-    
+
     // Child process continues
     // Create new session and become session leader
     if (setsid() < 0) {
         return false;
     }
-    
+
     // Fork again to ensure we're not a session leader
     pid = fork();
     if (pid < 0) {
         return false;
     }
-    
+
     if (pid > 0) {
         exit(0); // First child exits
     }
-    
+
     // Second child process continues as daemon
     // Change working directory to root
     chdir("/");
-    
+
     // Close standard file descriptors
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
-    
+
     // Redirect standard file descriptors to /dev/null
     open("/dev/null", O_RDONLY); // stdin
     open("/dev/null", O_WRONLY); // stdout
     open("/dev/null", O_WRONLY); // stderr
-    
+
     return true;
 #endif
 }

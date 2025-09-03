@@ -118,20 +118,20 @@ def get_utc_time(host='localhost', port=37):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(5)
         sock.connect((host, port))
-        
+
         # Receive 4-byte timestamp
         data = sock.recv(4)
         sock.close()
-        
+
         if len(data) != 4:
             raise ValueError("Invalid response length")
-        
+
         # Convert from UTC epoch (1900) to Unix epoch (1970)
         utc_timestamp = struct.unpack('!I', data)[0]
         unix_timestamp = utc_timestamp - 2208988800
-        
+
         return datetime.fromtimestamp(unix_timestamp, tz=time.timezone.utc)
-        
+
     except Exception as e:
         print(f"Error getting UTC time: {e}")
         return None
@@ -158,39 +158,39 @@ int get_utc_time(const char* host, int port) {
     struct sockaddr_in server_addr;
     uint32_t utc_timestamp;
     time_t unix_timestamp;
-    
+
     // Create socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         perror("socket");
         return -1;
     }
-    
+
     // Set up server address
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
     inet_pton(AF_INET, host, &server_addr.sin_addr);
-    
+
     // Connect to server
     if (connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         perror("connect");
         close(sockfd);
         return -1;
     }
-    
+
     // Receive timestamp
     if (recv(sockfd, &utc_timestamp, sizeof(utc_timestamp), 0) != sizeof(utc_timestamp)) {
         perror("recv");
         close(sockfd);
         return -1;
     }
-    
+
     close(sockfd);
-    
+
     // Convert from UTC epoch (1900) to Unix epoch (1970)
     unix_timestamp = ntohl(utc_timestamp) - 2208988800;
-    
+
     printf("UTC Time: %s", ctime(&unix_timestamp));
     return 0;
 }
@@ -208,14 +208,14 @@ int main() {
 get_utc_time() {
     local host=${1:-localhost}
     local port=${2:-37}
-    
+
     # Connect and get timestamp
     local timestamp=$(echo "" | nc $host $port | od -An -td4 | tr -d ' ')
-    
+
     if [ -n "$timestamp" ]; then
         # Convert from UTC epoch (1900) to Unix epoch (1970)
         local unix_timestamp=$((timestamp - 2208988800))
-        
+
         # Convert to readable format
         date -d "@$unix_timestamp" "+%Y-%m-%d %H:%M:%S UTC"
     else

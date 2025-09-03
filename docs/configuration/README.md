@@ -173,7 +173,7 @@ simple-utcd -c /path/to/custom.conf
 - **Examples**:
   ```ini
   authentication_key = my-secret-key
-  authentication_key = 
+  authentication_key =
   ```
 
 #### `allowed_clients`

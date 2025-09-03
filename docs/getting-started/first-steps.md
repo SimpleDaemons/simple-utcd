@@ -126,40 +126,40 @@ def test_utc_service(host='localhost', port=37):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(5)
         sock.connect((host, port))
-        
+
         # Receive UTC timestamp (4 bytes)
         data = sock.recv(4)
         sock.close()
-        
+
         if len(data) != 4:
             print(f"ERROR: Expected 4 bytes, got {len(data)}")
             return False
-        
+
         # Convert from UTC epoch (1900) to Unix epoch (1970)
         utc_timestamp = struct.unpack('!I', data)[0]
         unix_timestamp = utc_timestamp - 2208988800
-        
+
         # Convert to readable format
         utc_time = datetime.fromtimestamp(unix_timestamp, tz=time.timezone.utc)
         current_time = datetime.now(time.timezone.utc)
-        
+
         # Check if time is reasonable (within 1 hour)
         time_diff = abs((utc_time - current_time).total_seconds())
-        
+
         print(f"UTC Service Test Results:")
         print(f"  Received UTC timestamp: {utc_timestamp}")
         print(f"  Converted to Unix: {unix_timestamp}")
         print(f"  UTC Time: {utc_time}")
         print(f"  Current Time: {current_time}")
         print(f"  Time Difference: {time_diff:.2f} seconds")
-        
+
         if time_diff < 3600:  # Within 1 hour
             print("  ✅ SUCCESS: UTC service is working correctly")
             return True
         else:
             print("  ⚠️  WARNING: Time difference is large")
             return False
-            
+
     except Exception as e:
         print(f"  ❌ ERROR: {e}")
         return False

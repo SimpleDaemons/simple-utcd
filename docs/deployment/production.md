@@ -171,7 +171,7 @@ CLUSTER_PORT=37
 
 check_cluster_health() {
     local healthy_nodes=()
-    
+
     for node in "${CLUSTER_NODES[@]}"; do
         if nc -z $node $CLUSTER_PORT; then
             healthy_nodes+=($node)
@@ -180,7 +180,7 @@ check_cluster_health() {
             echo "❌ $node is unhealthy"
         fi
     done
-    
+
     echo "Healthy nodes: ${#healthy_nodes[@]}/${#CLUSTER_NODES[@]}"
     return ${#healthy_nodes[@]}
 }
@@ -188,12 +188,12 @@ check_cluster_health() {
 failover_cluster() {
     local primary_node=$1
     local backup_node=$2
-    
+
     echo "🔄 Initiating failover from $primary_node to $backup_node"
-    
+
     # Update load balancer configuration
     # (Implementation depends on your load balancer)
-    
+
     # Notify monitoring systems
     curl -X POST "http://monitoring:9093/api/v1/alerts" \
         -H "Content-Type: application/json" \
@@ -391,11 +391,11 @@ filter {
     grok {
       match => { "message" => "\[%{TIMESTAMP_ISO8601:timestamp}\] \[%{WORD:level}\] %{GREEDYDATA:message}" }
     }
-    
+
     date {
       match => [ "timestamp", "yyyy-MM-dd HH:mm:ss.SSS" ]
     }
-    
+
     if [level] == "ERROR" {
       mutate {
         add_tag => [ "error" ]
@@ -566,16 +566,16 @@ NEW_VERSION="0.2.0"
 
 for node in "${CLUSTER_NODES[@]}"; do
     echo "🔄 Updating $node to version $NEW_VERSION"
-    
+
     # Drain connections
     ssh $node "systemctl stop simple-utcd"
-    
+
     # Update binary
     scp simple-utcd-$NEW_VERSION $node:/usr/local/bin/simple-utcd
-    
+
     # Start service
     ssh $node "systemctl start simple-utcd"
-    
+
     # Wait for health check
     sleep 30
     if ssh $node "nc -z localhost 37"; then
@@ -594,29 +594,29 @@ done
 check_production_health() {
     local node=$1
     local issues=()
-    
+
     # Check service status
     if ! ssh $node "systemctl is-active --quiet simple-utcd"; then
         issues+=("Service not running")
     fi
-    
+
     # Check port listening
     if ! ssh $node "nc -z localhost 37"; then
         issues+=("Port 37 not listening")
     fi
-    
+
     # Check memory usage
     local memory=$(ssh $node "ps -o rss= -p \$(pgrep simple-utcd)")
     if [ $memory -gt 1000000 ]; then  # 1GB
         issues+=("High memory usage: ${memory}KB")
     fi
-    
+
     # Check disk space
     local disk=$(ssh $node "df /var/log/simple-utcd | tail -1 | awk '{print \$5}' | sed 's/%//'")
     if [ $disk -gt 80 ]; then
         issues+=("High disk usage: ${disk}%")
     fi
-    
+
     if [ ${#issues[@]} -eq 0 ]; then
         echo "✅ $node is healthy"
         return 0

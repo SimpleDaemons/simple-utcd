@@ -84,6 +84,7 @@ set(SOURCES
     src/core/utc_packet.cpp
     src/core/utc_config.cpp
     src/core/logger.cpp
+    src/core/error_handler.cpp
 )
 
 # Core library source files (without main.cpp)
@@ -93,6 +94,8 @@ set(CORE_SOURCES
     src/core/utc_packet.cpp
     src/core/utc_config.cpp
     src/core/logger.cpp
+    src/core/platform.cpp
+    src/core/error_handler.cpp
 )
 
 # Header files
@@ -103,6 +106,7 @@ set(HEADERS
     include/simple_utcd/utc_config.hpp
     include/simple_utcd/logger.hpp
     include/simple_utcd/platform.hpp
+    include/simple_utcd/error_handler.hpp
 )
 
 # Create core library
@@ -184,7 +188,7 @@ if(PLATFORM_MACOS)
     set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Simple UTC Daemon for macOS")
     set(CPACK_PACKAGE_VENDOR "simple-utcd")
-    set(CPACK_PACKAGE_CONTACT "contact@blburns.com")
+    set(CPACK_PACKAGE_CONTACT "SimpleDaemons")
     set(CPACK_PACKAGE_FILE_NAME "simple-utcd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
     set(CPACK_DMG_VOLUME_NAME "simple-utcd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
     set(CPACK_DMG_FORMAT "UDZO")
@@ -194,7 +198,7 @@ if(PLATFORM_MACOS)
     set(CPACK_PRODUCTBUILD_PACKAGE_VERSION "${PROJECT_VERSION}")
     set(CPACK_PRODUCTBUILD_PACKAGE_DESCRIPTION "Simple UTC Daemon for macOS - ${SYSTEM_ARCH}")
     set(CPACK_PRODUCTBUILD_PACKAGE_VENDOR "simple-utcd")
-    set(CPACK_PRODUCTBUILD_PACKAGE_CONTACT "contact@blburns.com")
+    set(CPACK_PRODUCTBUILD_PACKAGE_CONTACT "SimpleDaemons")
 
     include(CPack)
 endif()

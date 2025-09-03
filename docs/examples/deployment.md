@@ -263,24 +263,43 @@ nc -zv $NODE_IP 37
 
 ## Docker Deployment
 
-### Docker Compose Setup
+### Quick Docker Deployment
+```bash
+# Navigate to Docker examples
+cd deployment/examples/docker
+
+# Create configuration directory
+mkdir -p config logs
+cp ../../config/examples/simple/simple-utcd.conf.example config/simple-utcd.conf
+
+# Start the service
+docker-compose up -d
+
+# Check status
+docker-compose ps
+```
+
+### Docker Compose Setup (Production)
 ```yaml
 # docker-compose.yml
 version: '3.8'
 
 services:
   simple-utcd:
-    image: simple-utcd:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
     container_name: simple-utcd
     ports:
-      - "37:37/udp"
       - "37:37/tcp"
     volumes:
       - ./config:/etc/simple-utcd:ro
       - ./logs:/var/log/simple-utcd
     environment:
-      - UTCD_AUTH_KEY=your-secret-key
-      - UTCD_LOG_LEVEL=INFO
+      - SIMPLE_UTCD_LOG_LEVEL=INFO
+      - SIMPLE_UTCD_LISTEN_ADDRESS=0.0.0.0
+      - SIMPLE_UTCD_LISTEN_PORT=37
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "37"]
@@ -294,7 +313,6 @@ services:
     image: haproxy:latest
     container_name: utc-haproxy
     ports:
-      - "37:37/udp"
       - "37:37/tcp"
       - "8404:8404"
     volumes:
@@ -308,6 +326,21 @@ services:
 networks:
   utc-network:
     driver: bridge
+```
+
+### Docker Development Environment
+```bash
+# Start development environment
+docker-compose --profile dev up dev
+
+# Access development container
+docker-compose exec dev bash
+
+# Build for all platforms
+./scripts/build-docker.sh -d all
+
+# Deploy with custom settings
+./scripts/deploy-docker.sh -p runtime -c ./config -l ./logs
 ```
 
 ### Docker Compose Deployment Script
@@ -406,19 +439,19 @@ data:
     listen_port = 37
     enable_ipv6 = true
     max_connections = 1000
-    
+
     stratum = 2
     sync_interval = 64
     timeout = 1000
-    
+
     log_level = INFO
     enable_console_logging = false
     log_file = /var/log/simple-utcd/simple-utcd.log
-    
+
     enable_authentication = true
     authentication_key = ${UTCD_AUTH_KEY}
     allowed_clients = ["192.168.0.0/16", "10.0.0.0/8"]
-    
+
     worker_threads = 4
     enable_statistics = true
     stats_interval = 60
@@ -736,6 +769,7 @@ echo "🎉 Deployment verification successful!"
 
 ## Next Steps
 
+- **Docker Deployment**: See [Docker Deployment Guide](../deployment/docker.md) for comprehensive Docker setup
 - **Monitoring**: Set up monitoring and alerting
 - **Backup**: Configure backup and recovery
 - **Security**: Implement security hardening

@@ -4,6 +4,12 @@ This directory contains real-world configuration examples for Simple UTC Daemon 
 
 ## Example Categories
 
+### Docker Examples
+- **Quick Start**: Simple Docker deployment for development
+- **Production**: Production-ready Docker setup with monitoring
+- **Multi-Platform**: Cross-platform Docker builds
+- **Development**: Development environment with debugging tools
+
 ### Simple Examples
 - **Basic Configuration**: Minimal setup for development and testing
 - **Local Development**: Configuration for local development environments
@@ -20,6 +26,34 @@ This directory contains real-world configuration examples for Simple UTC Daemon 
 - **Multi-Site**: Configuration for multi-site deployments
 
 ## Quick Start Examples
+
+### Docker Quick Start
+```bash
+# Navigate to Docker examples
+cd deployment/examples/docker
+
+# Create configuration directory
+mkdir -p config logs
+cp ../../config/examples/simple/simple-utcd.conf.example config/simple-utcd.conf
+
+# Start the service
+docker-compose up -d
+
+# Check status
+docker-compose ps
+```
+
+### Docker Development Environment
+```bash
+# Start development environment
+docker-compose --profile dev up dev
+
+# Access development container
+docker-compose exec dev bash
+
+# Build for all platforms
+./scripts/build-docker.sh -d all
+```
 
 ### Basic Development Setup
 ```ini
@@ -51,6 +85,14 @@ enable_statistics = true
 
 ## Example Files
 
+### Docker Examples
+- `deployment/examples/docker/docker-compose.yml` - Simple Docker deployment
+- `deployment/examples/docker/README.md` - Docker deployment guide
+- `Dockerfile` - Multi-stage Docker build
+- `docker-compose.yml` - Main Docker Compose configuration
+- `scripts/build-docker.sh` - Cross-platform build script
+- `scripts/deploy-docker.sh` - Deployment script
+
 ### Simple Examples
 - `simple-utcd.conf.example` - Basic configuration template
 - `development.conf` - Development environment setup
@@ -76,6 +118,10 @@ enable_statistics = true
 
 ### Example Commands
 ```bash
+# Docker deployment
+cd deployment/examples/docker
+docker-compose up -d
+
 # Copy simple example
 cp config/examples/simple/simple-utcd.conf.example /etc/simple-utcd/simple-utcd.conf
 
@@ -84,6 +130,9 @@ cp config/examples/production/enterprise.conf /etc/simple-utcd/simple-utcd.conf
 
 # Test configuration
 simple-utcd --config-test -c /etc/simple-utcd/simple-utcd.conf
+
+# Build for all platforms
+./scripts/build-docker.sh -d all
 ```
 
 ## Configuration Templates
@@ -187,6 +236,7 @@ max_connections = 10
 
 ## Next Steps
 
+- **Docker Deployment**: See [Docker Deployment Guide](../deployment/docker.md)
 - **Deployment**: See [Deployment Examples](deployment.md)
 - **Configuration**: See [Configuration Guide](../configuration/README.md)
 - **Troubleshooting**: See [Troubleshooting Guide](../troubleshooting/README.md)

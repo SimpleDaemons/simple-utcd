@@ -11,7 +11,26 @@ Get Simple UTC Daemon up and running in minutes with this quick start guide.
 
 ## Installation
 
-### Option 1: Pre-built Binaries (Recommended)
+### Option 1: Docker (Recommended)
+
+The fastest way to get started is with Docker:
+
+```bash
+# Clone the repository
+git clone https://github.com/simpledaemons/simple-utcd.git
+cd simple-utcd
+
+# Quick deployment
+cd deployment/examples/docker
+mkdir -p config logs
+cp ../../config/examples/simple/simple-utcd.conf.example config/simple-utcd.conf
+docker-compose up -d
+
+# Check status
+docker-compose ps
+```
+
+### Option 2: Pre-built Binaries
 
 Download the latest release for your platform:
 
@@ -25,7 +44,7 @@ sudo cp simple-utcd /usr/local/bin/
 # Download simple-utcd-windows-amd64.zip and extract
 ```
 
-### Option 2: Build from Source
+### Option 3: Build from Source
 
 ```bash
 git clone https://github.com/simpledaemons/simple-utcd.git
@@ -52,6 +71,19 @@ sudo nano /etc/simple-utcd/simple-utcd.conf
 
 ## Starting the Service
 
+### Docker (Recommended)
+```bash
+# Start with Docker Compose
+cd deployment/examples/docker
+docker-compose up -d
+
+# View logs
+docker-compose logs -f simple-utcd
+
+# Stop service
+docker-compose down
+```
+
 ### Linux/macOS
 ```bash
 # Run in foreground (for testing)
@@ -71,6 +103,15 @@ install-service.bat
 ```
 
 ## Testing the Service
+
+### Docker Testing
+```bash
+# Test Docker container
+docker-compose exec simple-utcd nc -z localhost 37
+
+# Check container health
+docker inspect --format='{{.State.Health.Status}}' simple-utcd
+```
 
 ### Test with telnet
 ```bash
@@ -134,6 +175,7 @@ nc -zv localhost 37
 
 ## Next Steps
 
+- **Docker deployment**: See [Docker Deployment Guide](../deployment/docker.md)
 - **Configure for production**: See [Production Setup](../deployment/production.md)
 - **Advanced configuration**: See [Configuration Guide](../configuration/README.md)
 - **Troubleshooting**: See [Troubleshooting Guide](../troubleshooting/README.md)

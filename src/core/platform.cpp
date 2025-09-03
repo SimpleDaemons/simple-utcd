@@ -1,3 +1,21 @@
+/*
+ * src/core/platform.cpp
+ *
+ * Copyright 2024 SimpleDaemons
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "simple_utcd/platform.hpp"
 #include <string>
 #include <cstring>
@@ -10,6 +28,9 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <cstdlib>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -106,7 +127,7 @@ int Platform::close_socket(int socket_fd) {
 }
 
 bool Platform::set_socket_option(int socket_fd, int level, int option, const void* value, int value_size) {
-    int result = setsockopt(socket_fd, level, option, 
+    int result = setsockopt(socket_fd, level, option,
                            reinterpret_cast<const char*>(value), value_size);
     if (result != 0) {
 #ifdef _WIN32
@@ -124,7 +145,7 @@ bool Platform::bind_socket(int socket_fd, const std::string& address, int port) 
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-    
+
     if (address.empty() || address == "0.0.0.0") {
         addr.sin_addr.s_addr = INADDR_ANY;
     } else {
@@ -133,7 +154,7 @@ bool Platform::bind_socket(int socket_fd, const std::string& address, int port) 
             return false;
         }
     }
-    
+
     int result = bind(socket_fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr));
     if (result != 0) {
 #ifdef _WIN32
@@ -162,7 +183,7 @@ bool Platform::listen_socket(int socket_fd, int backlog) {
 int Platform::accept_connection(int socket_fd, std::string& client_address) {
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
-    
+
     int client_fd = accept(socket_fd, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
     if (client_fd < 0) {
 #ifdef _WIN32
@@ -172,11 +193,11 @@ int Platform::accept_connection(int socket_fd, std::string& client_address) {
 #endif
         return -1;
     }
-    
+
     char client_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
     client_address = std::string(client_ip);
-    
+
     return client_fd;
 }
 
@@ -209,12 +230,9 @@ bool Platform::create_directory(const std::string& path) {
 
 std::string Platform::get_home_directory() {
 #ifdef _WIN32
-    char* user_profile = nullptr;
-    size_t len = 0;
-    if (_dupenv_s(&user_profile, &len, "USERPROFILE") == 0 && user_profile != nullptr) {
-        std::string result(user_profile);
-        free(user_profile);
-        return result;
+    const char* user_profile = std::getenv("USERPROFILE");
+    if (user_profile) {
+        return std::string(user_profile);
     }
     return "";
 #else
@@ -222,24 +240,21 @@ std::string Platform::get_home_directory() {
     if (home) {
         return std::string(home);
     }
-    
+
     struct passwd* pw = getpwuid(getuid());
     if (pw && pw->pw_dir) {
         return std::string(pw->pw_dir);
     }
-    
+
     return "";
 #endif
 }
 
 std::string Platform::get_config_directory() {
     if (is_windows()) {
-        char* app_data = nullptr;
-        size_t len = 0;
-        if (_dupenv_s(&app_data, &len, "APPDATA") == 0 && app_data != nullptr) {
-            std::string result = std::string(app_data) + "\\Simple-UTCd";
-            free(app_data);
-            return result;
+        const char* app_data = std::getenv("APPDATA");
+        if (app_data) {
+            return std::string(app_data) + "\\Simple-UTCd";
         }
         return "C:\\ProgramData\\Simple-UTCd";
     } else if (is_macos()) {
@@ -251,12 +266,9 @@ std::string Platform::get_config_directory() {
 
 std::string Platform::get_log_directory() {
     if (is_windows()) {
-        char* app_data = nullptr;
-        size_t len = 0;
-        if (_dupenv_s(&app_data, &len, "APPDATA") == 0 && app_data != nullptr) {
-            std::string result = std::string(app_data) + "\\Simple-UTCd\\logs";
-            free(app_data);
-            return result;
+        const char* app_data = std::getenv("APPDATA");
+        if (app_data) {
+            return std::string(app_data) + "\\Simple-UTCd\\logs";
         }
         return "C:\\ProgramData\\Simple-UTCd\\logs";
     } else if (is_macos()) {
@@ -298,7 +310,48 @@ bool Platform::daemonize() {
     // This would typically be handled by the Windows Service system
     return true;
 #else
-    return daemon(0, 0) == 0;
+    // Modern daemon implementation using fork() instead of deprecated daemon()
+    pid_t pid = fork();
+    
+    if (pid < 0) {
+        return false; // Fork failed
+    }
+    
+    if (pid > 0) {
+        exit(0); // Parent process exits
+    }
+    
+    // Child process continues
+    // Create new session and become session leader
+    if (setsid() < 0) {
+        return false;
+    }
+    
+    // Fork again to ensure we're not a session leader
+    pid = fork();
+    if (pid < 0) {
+        return false;
+    }
+    
+    if (pid > 0) {
+        exit(0); // First child exits
+    }
+    
+    // Second child process continues as daemon
+    // Change working directory to root
+    chdir("/");
+    
+    // Close standard file descriptors
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+    
+    // Redirect standard file descriptors to /dev/null
+    open("/dev/null", O_RDONLY); // stdin
+    open("/dev/null", O_WRONLY); // stdout
+    open("/dev/null", O_WRONLY); // stderr
+    
+    return true;
 #endif
 }
 

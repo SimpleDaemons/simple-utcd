@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  simple-utcd:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: simple-utcd
+    restart: unless-stopped
+    ports:
+      - "37:37/tcp"
+    volumes:
+      - ./config:/etc/simple-utcd:ro
+      - ./logs:/var/log/simple-utcd
+    environment:
+      - SIMPLE_UTCD_LISTEN_ADDRESS=0.0.0.0
+      - SIMPLE_UTCD_LISTEN_PORT=37
+      - SIMPLE_UTCD_LOG_LEVEL=INFO
+    networks:
+      - utc-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "37"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  utc-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

@@ -3,6 +3,9 @@
 		{
 			"name": "simple-utcd",
 			"path": "."
+		},
+		{
+			"path": "../simple-sftpd"
 		}
 	],
 	"settings": {

@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/metrics.hpp"
+#include "simple-utcd/utils/metrics.hpp"
 #include <map>
 
 using namespace simple_utcd;

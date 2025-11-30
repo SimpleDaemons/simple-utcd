@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 #include <atomic>
-#include "utc_packet.hpp"
+#include "simple-utcd/core/packet.hpp"
 
 namespace simple_utcd {
 

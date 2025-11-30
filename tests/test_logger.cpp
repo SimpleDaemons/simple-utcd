@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/logger.hpp"
+#include "simple-utcd/utils/logger.hpp"
 #include <fstream>
 #include <cstdio>
 #include <thread>

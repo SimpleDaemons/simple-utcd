@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/watchdog.hpp"
+#include "simple-utcd/utils/watchdog.hpp"
 #include <thread>
 #include <chrono>
 #include <atomic>

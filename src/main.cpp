@@ -4,10 +4,10 @@
 #include <chrono>
 #include <csignal>
 #include <atomic>
-#include "simple_utcd/utc_server.hpp"
-#include "simple_utcd/utc_config.hpp"
-#include "simple_utcd/logger.hpp"
-#include "simple_utcd/error_handler.hpp"
+#include "simple-utcd/core/server.hpp"
+#include "simple-utcd/config/config.hpp"
+#include "simple-utcd/utils/logger.hpp"
+#include "simple-utcd/utils/error_handler.hpp"
 
 // Global variables for signal handling
 static std::atomic<simple_utcd::UTCServer*> g_server_ptr{nullptr};

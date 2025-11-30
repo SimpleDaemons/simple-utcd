@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/health_check.hpp"
+#include "simple-utcd/utils/health_check.hpp"
 
 using namespace simple_utcd;
 

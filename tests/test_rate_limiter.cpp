@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/rate_limiter.hpp"
+#include "simple-utcd/security/rate_limiter.hpp"
 #include <thread>
 #include <chrono>
 

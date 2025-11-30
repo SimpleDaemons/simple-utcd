@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/backup_restore.hpp"
+#include "simple-utcd/utils/backup_restore.hpp"
 #include <fstream>
 #include <cstdio>
 #if __has_include(<filesystem>)

@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/upstream_manager.hpp"
+#include "simple-utcd/network/upstream_manager.hpp"
 #include <thread>
 #include <chrono>
 

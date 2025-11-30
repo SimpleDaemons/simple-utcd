@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/tls_manager.hpp"
+#include "simple-utcd/security/tls_manager.hpp"
 
 using namespace simple_utcd;
 

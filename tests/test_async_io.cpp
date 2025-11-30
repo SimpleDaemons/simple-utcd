@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/async_io.hpp"
+#include "simple-utcd/network/async_io.hpp"
 #include <thread>
 #include <chrono>
 #include <vector>

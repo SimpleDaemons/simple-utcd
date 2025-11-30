@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/graceful_degradation.hpp"
+#include "simple-utcd/utils/graceful_degradation.hpp"
 
 using namespace simple_utcd;
 

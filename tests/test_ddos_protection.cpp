@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/ddos_protection.hpp"
+#include "simple-utcd/security/ddos_protection.hpp"
 #include <thread>
 #include <chrono>
 

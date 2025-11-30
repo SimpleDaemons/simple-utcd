@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/acl.hpp"
+#include "simple-utcd/security/acl.hpp"
 
 using namespace simple_utcd;
 

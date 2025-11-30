@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple_utcd/auth.hpp"
+#include "simple-utcd/security/auth.hpp"
 #include <thread>
 #include <chrono>
 

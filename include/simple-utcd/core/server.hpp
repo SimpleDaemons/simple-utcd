@@ -23,11 +23,11 @@
 #include <atomic>
 #include <vector>
 #include <mutex>
-#include "utc_config.hpp"
-#include "logger.hpp"
-#include "metrics.hpp"
-#include "health_check.hpp"
-#include "async_io.hpp"
+#include "simple-utcd/config/config.hpp"
+#include "simple-utcd/utils/logger.hpp"
+#include "simple-utcd/utils/metrics.hpp"
+#include "simple-utcd/utils/health_check.hpp"
+#include "simple-utcd/network/async_io.hpp"
 
 namespace simple_utcd {
 

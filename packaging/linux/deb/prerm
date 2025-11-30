@@ -1,0 +1,15 @@
+#!/bin/bash
+# Pre-removal script for simple-utcd
+
+set -e
+
+PROJECT_NAME="simple-utcd"
+
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+    # Stop service before removal
+    systemctl stop "$simple-utcd" 2>/dev/null || true
+    systemctl disable "$simple-utcd" 2>/dev/null || true
+fi
+
+exit 0
+

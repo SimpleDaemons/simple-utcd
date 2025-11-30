@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/utc_config.hpp"
+#include "simple-utcd/config/config.hpp"
 #include <fstream>
 #include <sstream>
 #include <algorithm>

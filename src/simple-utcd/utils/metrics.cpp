@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/metrics.hpp"
+#include "simple-utcd/utils/metrics.hpp"
 #include <sstream>
 #include <iomanip>
 #include <algorithm>

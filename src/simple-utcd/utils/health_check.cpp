@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/health_check.hpp"
+#include "simple-utcd/utils/health_check.hpp"
 #include <sstream>
 #include <iomanip>
 #include <ctime>

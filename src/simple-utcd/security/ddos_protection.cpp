@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/ddos_protection.hpp"
+#include "simple-utcd/security/ddos_protection.hpp"
 #include <algorithm>
 #include <cmath>
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/upstream_manager.hpp"
+#include "simple-utcd/network/upstream_manager.hpp"
 #include <algorithm>
 #include <random>
 #include <sys/socket.h>

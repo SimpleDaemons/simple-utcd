@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-utcd/config.hpp"
+#include "simple-utcd/config/config.hpp"
 #include <fstream>
 #include <cstdio>
 #if __has_include(<filesystem>)

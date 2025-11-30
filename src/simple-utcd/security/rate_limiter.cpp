@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/rate_limiter.hpp"
+#include "simple-utcd/security/rate_limiter.hpp"
 #include <algorithm>
 #include <cmath>
 

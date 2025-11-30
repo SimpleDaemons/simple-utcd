@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/platform.hpp"
+#include "simple-utcd/utils/platform.hpp"
 #include <string>
 #include <cstring>
 #include <sys/socket.h>

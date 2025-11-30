@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/error_handler.hpp"
-#include "simple_utcd/logger.hpp"
+#include "simple-utcd/utils/error_handler.hpp"
+#include "simple-utcd/utils/logger.hpp"
 #include <iostream>
 #include <sstream>
 #include <iomanip>

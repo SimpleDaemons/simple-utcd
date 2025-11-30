@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/certificate_acl.hpp"
+#include "simple-utcd/security/certificate_acl.hpp"
 #include <algorithm>
 #include <cctype>
 #include <sstream>

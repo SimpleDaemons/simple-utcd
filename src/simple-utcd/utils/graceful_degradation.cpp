@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/graceful_degradation.hpp"
+#include "simple-utcd/utils/graceful_degradation.hpp"
 #include <algorithm>
 
 namespace simple_utcd {

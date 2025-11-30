@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/auth.hpp"
+#include "simple-utcd/security/auth.hpp"
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include <openssl/evp.h>

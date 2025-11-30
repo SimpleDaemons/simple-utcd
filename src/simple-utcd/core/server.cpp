@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/utc_server.hpp"
-#include "simple_utcd/utc_connection.hpp"
-#include "simple_utcd/utc_packet.hpp"
-#include "simple_utcd/platform.hpp"
-#include "simple_utcd/error_handler.hpp"
-#include "simple_utcd/metrics.hpp"
-#include "simple_utcd/health_check.hpp"
-#include "simple_utcd/async_io.hpp"
+#include "simple-utcd/core/server.hpp"
+#include "simple-utcd/core/connection.hpp"
+#include "simple-utcd/core/packet.hpp"
+#include "simple-utcd/utils/platform.hpp"
+#include "simple-utcd/utils/error_handler.hpp"
+#include "simple-utcd/utils/metrics.hpp"
+#include "simple-utcd/utils/health_check.hpp"
+#include "simple-utcd/network/async_io.hpp"
 #include <mutex>
 #include <thread>
 #include <chrono>

@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/utc_connection.hpp"
-#include "simple_utcd/utc_packet.hpp"
-#include "simple_utcd/platform.hpp"
-#include "simple_utcd/logger.hpp"
-#include "simple_utcd/utc_config.hpp"
-#include "simple_utcd/error_handler.hpp"
+#include "simple-utcd/core/connection.hpp"
+#include "simple-utcd/core/packet.hpp"
+#include "simple-utcd/utils/platform.hpp"
+#include "simple-utcd/utils/logger.hpp"
+#include "simple-utcd/config/config.hpp"
+#include "simple-utcd/utils/error_handler.hpp"
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

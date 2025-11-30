@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/watchdog.hpp"
+#include "simple-utcd/utils/watchdog.hpp"
 #include <thread>
 #include <chrono>
 

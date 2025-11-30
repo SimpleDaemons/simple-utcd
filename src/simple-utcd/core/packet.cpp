@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/utc_packet.hpp"
-#include "simple_utcd/error_handler.hpp"
+#include "simple-utcd/core/packet.hpp"
+#include "simple-utcd/utils/error_handler.hpp"
 #include <chrono>
 #include <ctime>
 #include <sstream>

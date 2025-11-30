@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-utcd/packet.hpp"
+#include "simple-utcd/core/packet.hpp"
 #include <vector>
 #include <cstdint>
 #include <thread>

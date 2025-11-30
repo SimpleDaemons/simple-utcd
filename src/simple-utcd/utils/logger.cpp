@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "simple_utcd/logger.hpp"
+#include "simple-utcd/utils/logger.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>

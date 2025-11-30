@@ -45,19 +45,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c")
 file(GLOB_RECURSE HEADERS "include/*.hpp" "include/*.h")
 
-# Explicitly list core source files to ensure proper compilation order
-list(APPEND SOURCES
-    src/core/metrics.cpp
-    src/core/health_check.cpp
-    src/core/async_io.cpp
-    src/core/upstream_manager.cpp
-    src/core/graceful_degradation.cpp
-    src/core/backup_restore.cpp
-    src/core/watchdog.cpp
-    src/core/tls_manager.cpp
-    src/core/certificate_acl.cpp
-)
-
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

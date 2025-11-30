@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  simple-utcd:
+    image: simple-utcd:latest
+    container_name: simple-utcd
+    ports:
+      - "8080:8080/tcp"
+    volumes:
+      - ./config:/etc/simple-utcd:ro
+      - ./data:/var/lib/simple-utcd
+      - ./logs:/var/log/simple-utcd
+    environment:
+      - SIMPLE-UTCD_CONFIG=/etc/simple-utcd/simple-utcd.conf
+      - SIMPLE-UTCD_LOG_LEVEL=info
+      - SIMPLE-UTCD_BIND_ADDRESS=0.0.0.0
+      - SIMPLE-UTCD_BIND_PORT=8080
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - simple-utcd-network
+
+networks:
+  simple-utcd-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16

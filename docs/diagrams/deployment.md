@@ -12,8 +12,8 @@ graph TB
 
     subgraph "UTC Server"
         Server[simple-utcd<br/>Main Process]
-        Config[/etc/simple-utcd/<br/>Configuration]
-        Logs[/var/log/simple-utcd/<br/>UTC Logs]
+        Config[Configuration<br/>/etc/simple-utcd/]
+        Logs[UTC Logs<br/>/var/log/simple-utcd/]
     end
 
     subgraph "Upstream Servers"

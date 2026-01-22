@@ -7,8 +7,8 @@ Welcome to the Simple UTC Daemon documentation. This guide will help you underst
 Simple UTC Daemon is available in three versions, each designed for different deployment scenarios:
 
 ### 🏭 Production Version
-**License:** Apache 2.0  
-**Status:** ✅ Version 0.3.2 Complete  
+**License:** Apache 2.0
+**Status:** ✅ Version 0.3.2 Complete
 **Target:** Small to medium deployments, single-server installations
 
 - Complete UTC protocol implementation (RFC 868)
@@ -21,8 +21,8 @@ Simple UTC Daemon is available in three versions, each designed for different de
 **Documentation:** [Production Version Documentation](production/README.md)
 
 ### 🏢 Enterprise Version
-**License:** BSL 1.1 (Business Source License 1.1)  
-**Status:** 📋 Planned  
+**License:** BSL 1.1 (Business Source License 1.1)
+**Status:** 📋 Planned
 **Target:** Large deployments, multi-server environments, enterprise integrations
 
 - All Production Version features included
@@ -38,8 +38,8 @@ Simple UTC Daemon is available in three versions, each designed for different de
 **Documentation:** [Enterprise Version Documentation](enterprise/README.md)
 
 ### 🏛️ Datacenter Version
-**License:** BSL 1.1 (Business Source License 1.1)  
-**Status:** 📋 Planned  
+**License:** BSL 1.1 (Business Source License 1.1)
+**Status:** 📋 Planned
 **Target:** Large-scale datacenter deployments, cloud environments, multi-site operations
 
 - All Enterprise Version features included
@@ -206,7 +206,7 @@ If you find any issues with the documentation or have suggestions for improvemen
 
 ---
 
-**Last Updated:** December 2024  
-**Production Version:** 0.3.2  
-**Enterprise Version:** Planned  
+**Last Updated:** December 2024
+**Production Version:** 0.3.2
+**Enterprise Version:** Planned
 **Datacenter Version:** Planned

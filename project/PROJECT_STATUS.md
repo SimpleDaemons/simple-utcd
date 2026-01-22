@@ -10,6 +10,28 @@ Simple UTC Daemon is a lightweight, high-performance UTC (Universal Time Coordin
 - Multi-format configuration (JSON, YAML, INI)
 - Containerized deployment (Docker)
 
+## 📦 Product Versions
+
+The project is organized into three product versions:
+
+### 🏭 Production Version (Apache 2.0)
+- **Status:** ✅ Version 0.3.2 Complete
+- **Target:** Small to medium deployments, single-server installations
+- **Features:** Complete UTC protocol, basic security, multi-format configuration, hot reload
+- **Documentation:** `docs/production/`
+
+### 🏢 Enterprise Version (BSL 1.1)
+- **Status:** 📋 Planned
+- **Target:** Large deployments, multi-server environments, enterprise integrations
+- **Features:** All Production features + Web UI, REST API, SNMP, HA, advanced security
+- **Documentation:** `docs/enterprise/`
+
+### 🏛️ Datacenter Version (BSL 1.1)
+- **Status:** 📋 Planned
+- **Target:** Large-scale datacenter deployments, cloud environments, multi-site operations
+- **Features:** All Enterprise features + Horizontal scaling, multi-site sync, cloud integrations
+- **Documentation:** `docs/datacenter/`
+
 ## ✅ Completed Features
 
 ### 1. Core Application Structure

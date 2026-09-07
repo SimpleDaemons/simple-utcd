@@ -1,5 +1,8 @@
 # Simple UTC Daemon - Development Roadmap
 
+
+**Honesty note:** Prefer [project/PROGRESS_REPORT.md](project/PROGRESS_REPORT.md) when phase checkmarks may be historical. Item-level tracking: [project/ROADMAP_CHECKLIST.md](project/ROADMAP_CHECKLIST.md). Overview: [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md).
+
 ## Project Overview
 Simple UTC Daemon (simple-utcd) is a lightweight, secure, and easy-to-configure UTC time coordinate daemon implementation that provides precise Universal Time Coordinate services. This document outlines the development roadmap for future versions and features.
 

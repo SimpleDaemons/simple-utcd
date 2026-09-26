@@ -28,12 +28,16 @@
 
 namespace simple_utcd {
 
+// winsock2.h defines ERROR as a macro. Keep the enumerator name.
+#pragma push_macro("ERROR")
+#undef ERROR
 enum class LogLevel {
     DEBUG = 0,
     INFO = 1,
     WARN = 2,
     ERROR = 3
 };
+#pragma pop_macro("ERROR")
 
 class Logger {
 public:

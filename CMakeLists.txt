@@ -54,6 +54,9 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE SIMPLE_UTCD_VERSION="${PROJEC
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} Threads::Threads)
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} ws2_32)
+endif()
 
 if(ENABLE_SSL)
     target_link_libraries(${PROJECT_NAME} OpenSSL::SSL OpenSSL::Crypto)
@@ -78,7 +81,7 @@ endif()
 
 # Compiler-specific options
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W3 /WX)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W3 /WX /D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
     if(ENABLE_STATIC_LINKING)
         target_compile_options(${PROJECT_NAME} PRIVATE /MT)
     endif()

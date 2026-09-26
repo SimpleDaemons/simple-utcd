@@ -60,12 +60,15 @@ public:
 /**
  * @brief Error severity levels
  */
+#pragma push_macro("ERROR")
+#undef ERROR
 enum class ErrorSeverity {
     INFO,       // Informational
     WARNING,    // Warning - non-fatal
     ERROR,      // Error - may be recoverable
     CRITICAL    // Critical - fatal error
 };
+#pragma pop_macro("ERROR")
 
 /**
  * @brief Error context information

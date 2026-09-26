@@ -28,7 +28,10 @@
 #include <mutex>
 #include <condition_variable>
 #include <vector>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <BaseTsd.h>
+using ssize_t = SSIZE_T;
+#else
 #include <sys/types.h>
 #endif
 
@@ -37,12 +40,15 @@ namespace simple_utcd {
 /**
  * @brief Async I/O operation result
  */
+#pragma push_macro("ERROR")
+#undef ERROR
 enum class AsyncIOResult {
     SUCCESS,
     ERROR,
     TIMEOUT,
     CANCELLED
 };
+#pragma pop_macro("ERROR")
 
 /**
  * @brief Async I/O operation callback

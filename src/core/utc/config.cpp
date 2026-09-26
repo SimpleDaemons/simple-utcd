@@ -23,9 +23,14 @@
 #include <cctype>
 #include <cstdlib>
 #include <sys/stat.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#endif
 #if __has_include(<filesystem>)
 #include <filesystem>
 namespace fs = std::filesystem;

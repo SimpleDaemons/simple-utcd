@@ -24,7 +24,7 @@ namespace simple_utcd {
 GracefulDegradation::GracefulDegradation()
     : current_level_(DegradationLevel::NORMAL)
     , max_memory_mb_(1024)
-    , max_cpu_percent_(80.0)
+    , max_cpu_percent_(80)
     , max_connections_(1000)
     , min_health_score_(0.5)
     , current_memory_mb_(0)

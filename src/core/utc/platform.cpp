@@ -20,6 +20,27 @@
 #include <string>
 #include <cstring>
 #include <cerrno>
+#include <fstream>
+#include <chrono>
+#include <thread>
+#include <cstdlib>
+#include <ctime>
+#include <sys/stat.h>
+
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#include <shlobj.h>
+#include <process.h>
+#pragma comment(lib, "ws2_32.lib")
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -27,20 +48,11 @@
 #include <sys/stat.h>
 #include <pwd.h>
 #include <grp.h>
-#include <fstream>
-#include <chrono>
-#include <thread>
 #include <fcntl.h>
 #include <sys/types.h>
-#include <cstdlib>
+#endif
 
-#ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-#include <shlobj.h>
-#pragma comment(lib, "ws2_32.lib")
-#elif __APPLE__
+#if !defined(_WIN32) && defined(__APPLE__)
 #include <mach/mach_time.h>
 #include <mach/mach.h>
 #elif __linux__

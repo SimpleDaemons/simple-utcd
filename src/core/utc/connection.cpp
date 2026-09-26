@@ -22,16 +22,15 @@
 #include "simple-utcd/utils/logger.hpp"
 #include "simple-utcd/config/config.hpp"
 #include "simple-utcd/utils/error_handler.hpp"
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <cstring>
 
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <BaseTsd.h>
+using ssize_t = SSIZE_T;
 #else
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -143,7 +142,7 @@ bool UTCConnection::send_data(const void* data, size_t size) {
     size_t total_sent = 0;
 
     while (total_sent < size) {
-        ssize_t sent = send(socket_fd_, buffer + total_sent, size - total_sent, 0);
+        ssize_t sent = send(socket_fd_, buffer + total_sent, static_cast<int>(size - total_sent), 0);
 
         if (sent < 0) {
             UTC_ERROR("UTCConnection", "Failed to send data to " + client_address_ + ": " + Platform::get_last_error());
@@ -167,7 +166,7 @@ bool UTCConnection::receive_data(void* data, size_t size) {
 
     while (total_received < size) {
         ssize_t received = recv(socket_fd_, buffer + total_received,
-                               size - total_received, 0);
+                               static_cast<int>(size - total_received), 0);
 
         if (received < 0) {
             UTC_ERROR("UTCConnection", "Failed to receive data from " + client_address_ + ": " + Platform::get_last_error());

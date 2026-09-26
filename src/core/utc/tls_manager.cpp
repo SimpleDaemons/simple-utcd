@@ -23,7 +23,11 @@
 #include <chrono>
 #include <ctime>
 #include <cstring>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
 #include <unistd.h>
+#endif
 
 #ifdef ENABLE_SSL
 #include <openssl/pem.h>
@@ -664,7 +668,11 @@ void TLSConnection::close() {
 #endif
     
     if (socket_fd_ >= 0) {
+#ifdef _WIN32
+        closesocket(socket_fd_);
+#else
         ::close(socket_fd_);
+#endif
         socket_fd_ = -1;
     }
     

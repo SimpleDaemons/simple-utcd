@@ -19,11 +19,16 @@
 #include "simple-utcd/network/upstream_manager.hpp"
 #include <algorithm>
 #include <random>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#endif
 #include <errno.h>
 #include <cstring>
 
@@ -320,9 +325,13 @@ uint64_t UpstreamManager::measure_response_time(const std::string& address, int 
         return 0;
     }
     
-    // Set non-blocking
+#ifdef _WIN32
+    u_long nonblocking = 1;
+    ioctlsocket(sock, FIONBIO, &nonblocking);
+#else
     int flags = fcntl(sock, F_GETFL, 0);
     fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+#endif
     
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(server_addr));
@@ -330,22 +339,38 @@ uint64_t UpstreamManager::measure_response_time(const std::string& address, int 
     server_addr.sin_port = htons(port);
     
     if (inet_pton(AF_INET, address.c_str(), &server_addr.sin_addr) <= 0) {
+#ifdef _WIN32
+        closesocket(sock);
+#else
         close(sock);
+#endif
         return 0;
     }
     
     auto start = std::chrono::steady_clock::now();
     int result = connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr));
     
-    if (result == 0 || errno == EINPROGRESS) {
-        // Connection successful or in progress
+#ifdef _WIN32
+    const bool in_progress = WSAGetLastError() == WSAEWOULDBLOCK;
+#else
+    const bool in_progress = errno == EINPROGRESS;
+#endif
+    if (result == 0 || in_progress) {
         auto end = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+#ifdef _WIN32
+        closesocket(sock);
+#else
         close(sock);
+#endif
         return duration.count();
     }
     
+#ifdef _WIN32
+    closesocket(sock);
+#else
     close(sock);
+#endif
     return 0;
 }
 

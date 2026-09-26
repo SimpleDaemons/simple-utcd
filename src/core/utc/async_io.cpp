@@ -17,8 +17,13 @@
  */
 
 #include "simple-utcd/network/async_io.hpp"
+#ifdef _WIN32
+#include <winsock2.h>
+#include <BaseTsd.h>
+#else
 #include <unistd.h>
 #include <sys/socket.h>
+#endif
 #include <errno.h>
 #include <cstring>
 #include <cstdlib>
@@ -182,11 +187,19 @@ void AsyncIOManager::execute_operation(std::unique_ptr<AsyncIOOperation> op) {
 }
 
 ssize_t AsyncIOManager::perform_read(int fd, void* buffer, size_t size) {
+#ifdef _WIN32
+    return ::recv(fd, static_cast<char*>(buffer), static_cast<int>(size), 0);
+#else
     return ::read(fd, buffer, size);
+#endif
 }
 
 ssize_t AsyncIOManager::perform_write(int fd, const void* buffer, size_t size) {
+#ifdef _WIN32
+    return ::send(fd, static_cast<const char*>(buffer), static_cast<int>(size), 0);
+#else
     return ::write(fd, buffer, size);
+#endif
 }
 
 size_t AsyncIOManager::get_pending_operations() const {

@@ -23,8 +23,12 @@
 #include <iomanip>
 #include <chrono>
 #include <ctime>
+#ifdef _WIN32
+#include <process.h>
+#else
 #include <syslog.h>
 #include <unistd.h>
+#endif
 #include <cstdio>
 #if defined(ENABLE_JSON) && ENABLE_JSON
 #include <json/json.h>
@@ -147,6 +151,7 @@ void Logger::enable_console(bool enable) {
 }
 
 void Logger::enable_syslog(bool enable) {
+#ifndef _WIN32
     if (enable && !syslog_enabled_) {
         openlog("simple-utcd", LOG_PID | LOG_CONS, LOG_DAEMON);
         syslog_enabled_ = true;
@@ -154,6 +159,10 @@ void Logger::enable_syslog(bool enable) {
         closelog();
         syslog_enabled_ = false;
     }
+#else
+    (void)enable;
+    syslog_enabled_ = false;
+#endif
 }
 
 void Logger::set_json_format(bool enable) {
@@ -216,6 +225,7 @@ void Logger::log(LogLevel level, const std::string& message) {
         current_log_size_ += log_message.length() + 1; // +1 for newline
     }
 
+#ifndef _WIN32
     // Syslog output (always use plain text for syslog)
     if (syslog_enabled_) {
         int priority;
@@ -238,6 +248,7 @@ void Logger::log(LogLevel level, const std::string& message) {
         }
         syslog(priority, "%s", message.c_str());
     }
+#endif
 }
 
 std::string Logger::level_to_string(LogLevel level) {
@@ -296,7 +307,11 @@ std::string Logger::format_json_log(LogLevel level, const std::string& message) 
     log_entry["severity"] = level_to_string(level);
     
     // Add process info for observability
+#ifdef _WIN32
+    log_entry["pid"] = static_cast<int>(_getpid());
+#else
     log_entry["pid"] = static_cast<int>(getpid());
+#endif
     
     Json::StreamWriterBuilder builder;
     builder["indentation"] = "";  // Compact JSON

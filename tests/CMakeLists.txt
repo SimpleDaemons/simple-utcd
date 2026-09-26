@@ -52,8 +52,12 @@ target_link_libraries(simple_utcd_tests
 file(GLOB_RECURSE CORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../src/core/*.cpp")
 target_sources(simple_utcd_tests PRIVATE ${CORE_SOURCES})
 
-# Include directories for the core sources
-target_include_directories(simple_utcd_tests PRIVATE
+# Include directories for the core sources.
+# OpenSSL and jsoncpp add /opt/local/include as -isystem on the MacPorts
+# builder. That directory ships its own gtest headers, which otherwise win
+# over FetchContent and fail the link (MakeAndRegisterTestInfo ABI).
+target_include_directories(simple_utcd_tests BEFORE PRIVATE
+    ${googletest_SOURCE_DIR}/googletest/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
 )
 

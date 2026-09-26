@@ -133,7 +133,9 @@ private:
     bool perform_health_check(UpstreamServer& server);
     uint64_t measure_response_time(const std::string& address, int port);
     
-    // Selection algorithms
+    // Selection algorithms. Callers must already hold servers_mutex_.
+    bool server_available_locked(const UpstreamServer& server) const;
+    UpstreamServer* primary_server_locked();
     UpstreamServer* select_round_robin();
     UpstreamServer* select_least_latency();
     UpstreamServer* select_health_based();

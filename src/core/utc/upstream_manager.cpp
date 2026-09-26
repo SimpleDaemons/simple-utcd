@@ -139,7 +139,10 @@ UpstreamServer* UpstreamManager::select_server() {
 
 UpstreamServer* UpstreamManager::get_primary_server() {
     std::lock_guard<std::mutex> lock(servers_mutex_);
-    
+    return primary_server_locked();
+}
+
+UpstreamServer* UpstreamManager::primary_server_locked() {
     UpstreamServer* best = nullptr;
     for (auto& pair : servers_) {
         if (!pair.second.enabled) continue;
@@ -160,7 +163,7 @@ UpstreamServer* UpstreamManager::get_primary_server() {
 UpstreamServer* UpstreamManager::get_backup_server() {
     std::lock_guard<std::mutex> lock(servers_mutex_);
     
-    UpstreamServer* primary = get_primary_server();
+    UpstreamServer* primary = primary_server_locked();
     if (!primary) return nullptr;
     
     UpstreamServer* backup = nullptr;
@@ -241,22 +244,25 @@ uint64_t UpstreamManager::get_server_response_time(const std::string& address) c
     return 0;
 }
 
+bool UpstreamManager::server_available_locked(const UpstreamServer& server) const {
+    return server.enabled &&
+           server.status != ServerStatus::FAILED &&
+           server.status != ServerStatus::UNHEALTHY;
+}
+
 bool UpstreamManager::is_server_available(const std::string& address) const {
     std::lock_guard<std::mutex> lock(servers_mutex_);
     auto it = servers_.find(address);
-    if (it != servers_.end()) {
-        const auto& server = it->second;
-        return server.enabled && 
-               server.status != ServerStatus::FAILED &&
-               server.status != ServerStatus::UNHEALTHY;
+    if (it == servers_.end()) {
+        return false;
     }
-    return false;
+    return server_available_locked(it->second);
 }
 
 bool UpstreamManager::has_available_servers() const {
     std::lock_guard<std::mutex> lock(servers_mutex_);
     for (const auto& pair : servers_) {
-        if (is_server_available(pair.first)) {
+        if (server_available_locked(pair.second)) {
             return true;
         }
     }
@@ -348,7 +354,7 @@ UpstreamServer* UpstreamManager::select_round_robin() {
     
     std::vector<UpstreamServer*> available;
     for (auto& pair : servers_) {
-        if (is_server_available(pair.first)) {
+        if (server_available_locked(pair.second)) {
             available.push_back(&pair.second);
         }
     }
@@ -364,7 +370,7 @@ UpstreamServer* UpstreamManager::select_least_latency() {
     uint64_t best_latency = UINT64_MAX;
     
     for (auto& pair : servers_) {
-        if (!is_server_available(pair.first)) continue;
+        if (!server_available_locked(pair.second)) continue;
         
         if (pair.second.response_time_ms > 0 && 
             pair.second.response_time_ms < best_latency) {
@@ -380,7 +386,7 @@ UpstreamServer* UpstreamManager::select_health_based() {
     UpstreamServer* best = nullptr;
     
     for (auto& pair : servers_) {
-        if (!is_server_available(pair.first)) continue;
+        if (!server_available_locked(pair.second)) continue;
         
         if (!best) {
             best = &pair.second;
@@ -408,7 +414,7 @@ UpstreamServer* UpstreamManager::select_priority() {
     UpstreamServer* best = nullptr;
     
     for (auto& pair : servers_) {
-        if (!is_server_available(pair.first)) continue;
+        if (!server_available_locked(pair.second)) continue;
         
         if (!best) {
             best = &pair.second;

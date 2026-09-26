@@ -28,8 +28,8 @@ This guide provides detailed installation instructions for Simple UTC Daemon on 
 #### Linux - Ubuntu/Debian
 ```bash
 # Download and install .deb package
-wget https://github.com/simpledaemons/simple-utcd/releases/latest/download/simple-utcd_0.1.0_amd64.deb
-sudo dpkg -i simple-utcd_0.1.0_amd64.deb
+wget https://github.com/simpledaemons/simple-utcd/releases/latest/download/simple-utcd_1.0.0_amd64.deb
+sudo dpkg -i simple-utcd_1.0.0_amd64.deb
 
 # Install dependencies if needed
 sudo apt-get install -f
@@ -38,21 +38,21 @@ sudo apt-get install -f
 #### Linux - CentOS/RHEL
 ```bash
 # Download and install .rpm package
-wget https://github.com/simpledaemons/simple-utcd/releases/latest/download/simple-utcd-0.1.0-1.x86_64.rpm
-sudo rpm -i simple-utcd-0.1.0-1.x86_64.rpm
+wget https://github.com/simpledaemons/simple-utcd/releases/latest/download/simple-utcd-1.0.0-1.x86_64.rpm
+sudo rpm -i simple-utcd-1.0.0-1.x86_64.rpm
 ```
 
 #### macOS
 ```bash
 # Download and install .pkg package
-curl -L -O https://github.com/simpledaemons/simple-utcd/releases/latest/download/simple-utcd-0.1.0.pkg
-sudo installer -pkg simple-utcd-0.1.0.pkg -target /
+curl -L -O https://github.com/simpledaemons/simple-utcd/releases/latest/download/simple-utcd-1.0.0.pkg
+sudo installer -pkg simple-utcd-1.0.0.pkg -target /
 ```
 
 #### Windows
 ```cmd
 # Download and run .msi installer
-# Download from: https://github.com/simpledaemons/simple-utcd/releases/latest/download/simple-utcd-0.1.0.msi
+# Download from: https://github.com/simpledaemons/simple-utcd/releases/latest/download/simple-utcd-1.0.0.msi
 # Run the installer as Administrator
 ```
 

@@ -1,6 +1,6 @@
 # Production Version UOPERATIONS Guide
 
-**Version:** 0.3.2  
+**Version:** 1.0.0  
 **License:** Apache 2.0
 
 ---
@@ -14,4 +14,4 @@ See [Production README](README.md) for complete documentation.
 ---
 
 **Last Updated:** December 2024  
-**Version:** 0.3.2
+**Version:** 1.0.0

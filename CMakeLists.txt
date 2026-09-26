@@ -3,7 +3,10 @@
 # Copyright 2024 SimpleDaemons
 
 cmake_minimum_required(VERSION 3.16)
-project(simple-utcd VERSION 1.0.0 LANGUAGES CXX)
+project(simple-utcd
+    VERSION 1.0.0
+    DESCRIPTION "RFC 868 time protocol daemon"
+    LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -138,10 +141,9 @@ if(ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
 
-# Package generation
+# Package generation. include(CPack) stays at the end of this block so the
+# variables below are written into CPackConfig.cmake.
 if(ENABLE_PACKAGING)
-    include(CPack)
-    
     # Package information
     set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
     set(CPACK_PACKAGE_VENDOR "SimpleDaemons")

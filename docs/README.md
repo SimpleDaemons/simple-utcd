@@ -117,6 +117,4 @@ If you find any issues with the documentation or have suggestions for improvemen
 ---
 
 **Last Updated:** December 2024
-**Production Version:** 0.3.2
-**Enterprise Version:** Planned
-**Datacenter Version:** Planned
+**Production Version:** 1.0.0

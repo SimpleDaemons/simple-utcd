@@ -10,7 +10,7 @@ simple-utcd uses [Semantic Versioning](https://semver.org/).
 
 ## Current version
 
-**0.1.0** — see [ROADMAP.md](ROADMAP.md) and [CHANGELOG.md](CHANGELOG.md).
+**1.0.0** — see [ROADMAP.md](ROADMAP.md) and [CHANGELOG.md](CHANGELOG.md). The initial tree is tagged `v0.1.0`.
 
 ## Rules
 

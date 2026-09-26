@@ -1,6 +1,6 @@
 # Production Version Configuration Guide
 
-**Version:** 0.3.2  
+**Version:** 1.0.0  
 **License:** Apache 2.0
 
 ---
@@ -67,4 +67,4 @@ sudo killall -HUP simple-utcd
 ---
 
 **Last Updated:** December 2024  
-**Version:** 0.3.2
+**Version:** 1.0.0

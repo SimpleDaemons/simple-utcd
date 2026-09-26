@@ -23,8 +23,9 @@
 #include <cctype>
 #include <cstdlib>
 #include <sys/stat.h>
-#include <arpa/inet.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #if __has_include(<filesystem>)
 #include <filesystem>
 namespace fs = std::filesystem;

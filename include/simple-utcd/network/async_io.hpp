@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <chrono>
+#include <cstdlib>
 #include <functional>
 #include <memory>
 #include <thread>
@@ -26,6 +28,9 @@
 #include <mutex>
 #include <condition_variable>
 #include <vector>
+#ifndef _WIN32
+#include <sys/types.h>
+#endif
 
 namespace simple_utcd {
 

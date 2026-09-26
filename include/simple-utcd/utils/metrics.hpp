@@ -20,6 +20,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 #include <atomic>
 #include <chrono>
 #include <mutex>

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <atomic>
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <map>

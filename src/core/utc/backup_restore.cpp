@@ -17,6 +17,7 @@
  */
 
 #include "simple-utcd/utils/backup_restore.hpp"
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <iomanip>

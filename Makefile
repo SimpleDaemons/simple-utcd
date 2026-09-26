@@ -124,7 +124,7 @@ build: $(BUILD_DIR)-dir
 ifeq ($(PLATFORM),windows)
 	cd $(BUILD_DIR) && cmake .. -G "Visual Studio 16 2019" -A x64 && cmake --build . --config Release
 else
-	cd $(BUILD_DIR) && cmake .. && make -j$(PARALLEL_JOBS)
+	cd $(BUILD_DIR) && cmake .. && $(MAKE) -j$(PARALLEL_JOBS)
 endif
 
 # Clean build
@@ -142,7 +142,7 @@ install: build
 ifeq ($(PLATFORM),windows)
 	cd $(BUILD_DIR) && cmake --install . --prefix "$(INSTALL_PREFIX)"
 else
-	cd $(BUILD_DIR) && sudo make install
+	cd $(BUILD_DIR) && sudo $(MAKE) install
 endif
 
 # Uninstall
@@ -162,7 +162,7 @@ test: build
 ifeq ($(PLATFORM),windows)
 	cd $(BUILD_DIR) && ctest --output-on-failure
 else
-	cd $(BUILD_DIR) && make test
+	cd $(BUILD_DIR) && $(MAKE) test
 endif
 
 # Generic package target (platform-specific)
@@ -200,14 +200,14 @@ dev-build: $(BUILD_DIR)-dir
 ifeq ($(PLATFORM),windows)
 	cd $(BUILD_DIR) && cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Debug && cmake --build . --config Debug
 else
-	cd $(BUILD_DIR) && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j$(PARALLEL_JOBS)
+	cd $(BUILD_DIR) && cmake .. -DCMAKE_BUILD_TYPE=Debug && $(MAKE) -j$(PARALLEL_JOBS)
 endif
 
 dev-test: dev-build
 ifeq ($(PLATFORM),windows)
 	cd $(BUILD_DIR) && ctest --output-on-failure
 else
-	cd $(BUILD_DIR) && make test
+	cd $(BUILD_DIR) && $(MAKE) test
 endif
 
 # Static binary targets
@@ -216,14 +216,14 @@ static-build: $(BUILD_DIR)-dir
 ifeq ($(PLATFORM),windows)
 	cd $(BUILD_DIR) && cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DENABLE_STATIC_LINKING=ON && cmake --build . --config Release
 else
-	cd $(BUILD_DIR) && cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_STATIC_LINKING=ON && make -j$(PARALLEL_JOBS)
+	cd $(BUILD_DIR) && cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_STATIC_LINKING=ON && $(MAKE) -j$(PARALLEL_JOBS)
 endif
 
 static-test: static-build
 ifeq ($(PLATFORM),windows)
 	cd $(BUILD_DIR) && ctest --output-on-failure
 else
-	cd $(BUILD_DIR) && make test
+	cd $(BUILD_DIR) && $(MAKE) test
 endif
 
 # Create static binary package

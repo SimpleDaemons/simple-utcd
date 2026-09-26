@@ -1,25 +1,21 @@
 # Simple UTC Daemon — Project Overview
 
 **Project:** `simple-utcd`  
-**Version:** 0.1.0  
-**Protocol / role:** UTC time sync  
-**Status:** Functional beta — usable features shipping; security/polish milestones remain.
+**Version:** 1.0.0  
+**Protocol / role:** RFC 868 time server (TCP and UDP port 37)  
+**Status:** Production. Serves the host clock.
+
+Keep the host clock synced with the operating system (chrony, systemd-timesyncd, or simple-ntpd). This daemon does not implement NTP.
 
 ## Where to look
 
 | Document | Role |
 |----------|------|
-| [ROADMAP.md](ROADMAP.md) | Public plan and milestones |
-| [project/ROADMAP_CHECKLIST.md](project/ROADMAP_CHECKLIST.md) | Item-level checklists |
-| [project/PROGRESS_REPORT.md](project/PROGRESS_REPORT.md) | Verified “what works” |
-| [project/PROJECT_STATUS.md](project/PROJECT_STATUS.md) | Metrics and health |
-| [project/TECHNICAL_DEBT.md](project/TECHNICAL_DEBT.md) | Known debt |
+| [README.md](README.md) | How to build and run |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
+| [project/PROJECT_STATUS.md](project/PROJECT_STATUS.md) | What 1.0.0 includes |
 | [RELEASING.md](RELEASING.md) | How to cut a release |
-| [VERSIONING.md](VERSIONING.md) | SemVer policy |
 
-## Portfolio
+Portfolio-wide status lives in the monorepo `PROJECTS_OVERVIEW.md`.
 
-This daemon is part of [SimpleDaemons](https://github.com/SimpleDaemons). Portfolio-wide status lives in the monorepo `docs/PROJECT_OVERVIEW.md` / `PROJECTS_OVERVIEW.md`.
-
-*Last updated: August 2026*
+*Last updated: September 2026*

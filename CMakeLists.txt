@@ -3,7 +3,7 @@
 # Copyright 2024 SimpleDaemons
 
 cmake_minimum_required(VERSION 3.16)
-project(simple-utcd VERSION 0.1.0 LANGUAGES CXX)
+project(simple-utcd VERSION 1.0.0 LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -46,7 +46,8 @@ file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c")
 file(GLOB_RECURSE HEADERS "include/*.hpp" "include/*.h")
 
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} main/production.cpp)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SIMPLE_UTCD_VERSION="${PROJECT_VERSION}")
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} Threads::Threads)

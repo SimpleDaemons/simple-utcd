@@ -1,15 +1,16 @@
 # Simple UTC Daemon
 
-A lightweight, high-performance UTC (Universal Time Coordinate) daemon written in C++.
+RFC 868 time server. It listens on TCP and UDP port 37 and answers with the host clock as a 32-bit count of seconds since 1900-01-01 00:00:00 UTC.
+
+Keep the host synced with chrony, systemd-timesyncd, or simple-ntpd. This daemon does not speak NTP.
 
 ## Features
 
-- **High Performance**: Optimized for low-latency time synchronization
-- **Cross-Platform**: Supports macOS, Linux, and Windows
-- **Configurable**: Flexible configuration options (INI, JSON, YAML formats)
-- **Secure**: Comprehensive security features including authentication, ACLs, rate limiting, and DDoS protection
-- **Containerized**: Full Docker support for development and deployment
-- **Version 0.3.0**: Enhanced security with authentication (MD5/SHA-1/SHA-256), access control lists, rate limiting, and DDoS protection
+- TCP and UDP, IPv4 and optional IPv6
+- Allow/deny lists (exact address or IPv4 CIDR) and per-client rate limits
+- Privilege drop after bind when started as root (`run_as_user`)
+- INI configuration, SIGHUP reload, `--config-test`
+- Version 1.0.0
 
 For detailed architecture documentation, see the [Architecture Guide](docs/architecture/README.md).
 

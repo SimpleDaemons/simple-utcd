@@ -1,5 +1,9 @@
 # Simple UTC Daemon - Development Roadmap
 
+**1.0.0 (September 2026)** is the production release: an RFC 868 server on TCP and UDP port 37. There is one product under Apache-2.0. Enterprise and datacenter editions are not planned. NTP stays in simple-ntpd.
+
+The checklist below this note is historical and is not a list of missing 1.0 work.
+
 
 **Honesty note:** Prefer [project/PROGRESS_REPORT.md](project/PROGRESS_REPORT.md) when phase checkmarks may be historical. Item-level tracking: [project/ROADMAP_CHECKLIST.md](project/ROADMAP_CHECKLIST.md). Overview: [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md).
 

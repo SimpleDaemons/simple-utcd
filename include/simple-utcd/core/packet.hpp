@@ -42,7 +42,18 @@ public:
     uint8_t get_version() const { return version_; }
     uint8_t get_mode() const { return mode_; }
 
-    // Current time utilities
+    // RFC 868 counts seconds since 1900-01-01 00:00:00 UTC.
+    static constexpr uint32_t kSecondsBetween1900And1970 = 2208988800u;
+    static uint32_t unix_to_rfc868(uint32_t unix_seconds) {
+        return static_cast<uint32_t>(static_cast<uint64_t>(unix_seconds) +
+                                     kSecondsBetween1900And1970);
+    }
+    static uint32_t rfc868_to_unix(uint32_t rfc868_seconds) {
+        return static_cast<uint32_t>(static_cast<uint64_t>(rfc868_seconds) -
+                                     kSecondsBetween1900And1970);
+    }
+
+    // Current time utilities. Values are RFC 868 timestamps.
     static uint32_t get_current_utc_timestamp();
     static std::pair<uint32_t, uint32_t> get_current_utc_timestamp_with_microseconds();
     static std::string timestamp_to_string(uint32_t timestamp);
@@ -65,7 +76,7 @@ public:
     std::string to_string() const;
 
 private:
-    uint32_t timestamp_;           // Seconds since epoch
+    uint32_t timestamp_;           // RFC 868 seconds since 1900-01-01 UTC
     uint32_t timestamp_microseconds_; // Microseconds fraction (0-999999)
     uint8_t version_;               // Protocol version
     uint8_t mode_;                  // Packet mode

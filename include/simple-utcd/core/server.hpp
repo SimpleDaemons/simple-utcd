@@ -23,11 +23,17 @@
 #include <atomic>
 #include <vector>
 #include <mutex>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <sys/socket.h>
+#endif
 #include "simple-utcd/config/config.hpp"
 #include "simple-utcd/utils/logger.hpp"
 #include "simple-utcd/utils/metrics.hpp"
 #include "simple-utcd/utils/health_check.hpp"
 #include "simple-utcd/network/async_io.hpp"
+#include "simple-utcd/security/rate_limiter.hpp"
 
 namespace simple_utcd {
 
@@ -67,6 +73,7 @@ private:
     std::atomic<bool> running_;
     std::vector<std::unique_ptr<UTCConnection>> connections_;
     std::vector<std::thread> worker_threads_;
+    std::vector<std::thread> io_threads_;
     std::mutex connections_mutex_;
 
     // Statistics
@@ -75,8 +82,10 @@ private:
     std::atomic<int> packets_sent_;
     std::atomic<int> packets_received_;
 
-    // Server socket
-    int server_socket_;
+    // Listening sockets. TCP uses accept; UDP answers each datagram in place.
+    std::vector<int> tcp_sockets_;
+    std::vector<int> udp_sockets_;
+    std::unique_ptr<RateLimiter> rate_limiter_;
     
     // Metrics and health checking
     std::unique_ptr<PerformanceMetrics> performance_metrics_;
@@ -85,11 +94,15 @@ private:
     // Async I/O support
     std::unique_ptr<AsyncIOManager> async_io_manager_;
 
-    void accept_connections();
+    void accept_loop(int fd);
+    void udp_loop(int fd);
     void handle_connection(std::unique_ptr<UTCConnection> connection);
     void worker_thread_main();
-    bool create_server_socket();
-    void close_server_socket();
+    bool open_listeners();
+    void close_listeners();
+    bool client_allowed(const std::string& client_address) const;
+    void send_udp_reply(int fd, const struct sockaddr* address, socklen_t address_len,
+                        const std::string& client_address);
 
     // UTC time handling
     uint32_t get_utc_timestamp();

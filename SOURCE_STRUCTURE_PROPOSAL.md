@@ -1,3 +1,5 @@
+The enterprise/datacenter split in this proposal is withdrawn. Each daemon is a single Apache-2.0 program.
+
 # Source Code Structure Proposal
 
 ## Current Structure

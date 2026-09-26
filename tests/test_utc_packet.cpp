@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <thread>
 #include <chrono>
+#include <ctime>
 
 using namespace simple_utcd;
 
@@ -120,6 +121,28 @@ TEST_F(UTCPacketTest, SetTimestamp) {
     uint32_t new_timestamp = 1609459200;
     packet.set_timestamp(new_timestamp);
     EXPECT_EQ(packet.get_timestamp(), new_timestamp);
+}
+
+TEST_F(UTCPacketTest, Rfc868Epoch) {
+    const uint32_t unix_2021 = 1609459200u;  // 2021-01-01 00:00:00 UTC
+    const uint32_t rfc868 = UTCPacket::unix_to_rfc868(unix_2021);
+    EXPECT_EQ(rfc868, unix_2021 + UTCPacket::kSecondsBetween1900And1970);
+    EXPECT_EQ(UTCPacket::rfc868_to_unix(rfc868), unix_2021);
+
+    UTCPacket packet(rfc868);
+    const std::vector<uint8_t> bytes = packet.to_bytes();
+    ASSERT_EQ(bytes.size(), 4u);
+    EXPECT_EQ(bytes[0], static_cast<uint8_t>((rfc868 >> 24) & 0xFF));
+    EXPECT_EQ(bytes[3], static_cast<uint8_t>(rfc868 & 0xFF));
+
+    const std::string text = UTCPacket::timestamp_to_string(rfc868);
+    EXPECT_NE(text.find("2021-01-01"), std::string::npos);
+
+    const auto now_unix = static_cast<uint64_t>(std::time(nullptr));
+    const uint32_t now_rfc = UTCPacket::get_current_utc_timestamp();
+    const auto expected = static_cast<uint32_t>(now_unix + UTCPacket::kSecondsBetween1900And1970);
+    EXPECT_LE(now_rfc, expected + 2);
+    EXPECT_GE(now_rfc, expected - 2);
 }
 
 // Test to_string

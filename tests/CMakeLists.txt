@@ -43,7 +43,6 @@ add_executable(simple_utcd_tests ${TEST_SOURCES})
 # Link libraries
 target_link_libraries(simple_utcd_tests
     PRIVATE
-    gtest_main
     gtest
     ${CMAKE_THREAD_LIBS_INIT}
 )

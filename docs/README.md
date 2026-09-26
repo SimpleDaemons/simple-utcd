@@ -4,55 +4,21 @@ Welcome to the Simple UTC Daemon documentation. This guide will help you underst
 
 ## Product Versions
 
-Simple UTC Daemon is available in three versions, each designed for different deployment scenarios:
+There is one build, licensed under Apache-2.0. Enterprise and datacenter editions are not part of this project.
 
 ### 🏭 Production Version
 **License:** Apache 2.0
-**Status:** ✅ Version 0.3.2 Complete
-**Target:** Small to medium deployments, single-server installations
+**Status:** Version 1.0.0
+**Target:** Hosts that need RFC 868 time (TCP and UDP port 37)
 
-- Complete UTC protocol implementation (RFC 868)
-- High-performance time synchronization
-- Basic security features (authentication, ACLs)
+- RFC 868 timestamps (seconds since 1900-01-01 UTC), from the host clock
+- TCP and UDP listeners, IPv4 and optional IPv6
+- Client allow/deny lists, including IPv4 CIDR, and per-client rate limits
 - Multi-format configuration (JSON, YAML, INI)
 - Hot reload configuration
 - Cross-platform support
 
 **Documentation:** [Production Version Documentation](production/README.md)
-
-### 🏢 Enterprise Version
-**License:** BSL 1.1 (Business Source License 1.1)
-**Status:** 📋 Planned
-**Target:** Large deployments, multi-server environments, enterprise integrations
-
-- All Production Version features included
-- Web management interface
-- REST API for management
-- SNMP integration
-- Advanced authentication and authorization (RBAC, ACLs)
-- Advanced security (rate limiting, DDoS protection)
-- High availability and clustering
-- Advanced monitoring and observability
-- Plugin architecture
-
-**Documentation:** [Enterprise Version Documentation](enterprise/README.md)
-
-### 🏛️ Datacenter Version
-**License:** BSL 1.1 (Business Source License 1.1)
-**Status:** 📋 Planned
-**Target:** Large-scale datacenter deployments, cloud environments, multi-site operations
-
-- All Enterprise Version features included
-- Horizontal scaling support
-- Multi-site synchronization
-- Cloud service integrations
-- Advanced performance optimizations
-- Multi-tenant support
-- Advanced analytics
-
-**Documentation:** [Datacenter Version Documentation](datacenter/README.md)
-
----
 
 ## Documentation Structure
 
@@ -76,23 +42,6 @@ Common documentation applicable to all versions:
 - **[Performance](production/performance.md)** - Production performance tuning
 - **[Operations](production/operations.md)** - Production operations guide
 
-### 🏢 Enterprise Version Documentation
-- **[Enterprise Guide](enterprise/README.md)** - Complete Enterprise Version documentation
-- **[Installation](enterprise/installation.md)** - Enterprise installation guide
-- **[Management Interface](enterprise/management.md)** - Web UI and REST API
-- **[High Availability](enterprise/high-availability.md)** - HA setup and configuration
-- **[Integrations](enterprise/integrations.md)** - SNMP and other integrations
-- **[Security](enterprise/security.md)** - Advanced security features
-- **[Operations](enterprise/operations.md)** - Enterprise operations guide
-
-### 🏛️ Datacenter Version Documentation
-- **[Datacenter Guide](datacenter/README.md)** - Complete Datacenter Version documentation
-- **[Installation](datacenter/installation.md)** - Datacenter installation guide
-- **[Multi-Site Setup](datacenter/multi-site.md)** - Multi-site configuration
-- **[Cloud Deployment](datacenter/cloud.md)** - Cloud deployment guides
-- **[Scaling](datacenter/scaling.md)** - Horizontal scaling and load balancing
-- **[Monitoring](datacenter/monitoring.md)** - Advanced monitoring and analytics
-
 ### 👨‍💻 Developer Documentation
 Documentation for developers and contributors:
 
@@ -109,45 +58,6 @@ Documentation for developers and contributors:
 2. [Quick Start Guide](shared/getting-started/quick-start.md)
 3. [Production Configuration](production/configuration.md)
 4. [Production Deployment](production/deployment.md)
-
-### Enterprise Version
-1. [Install Simple UTC Daemon](shared/getting-started/installation.md)
-2. [Enterprise Setup](enterprise/README.md)
-3. [Management Interface](enterprise/management.md)
-4. [High Availability](enterprise/high-availability.md)
-
-### Datacenter Version
-1. [Install Simple UTC Daemon](shared/getting-started/installation.md)
-2. [Datacenter Setup](datacenter/README.md)
-3. [Multi-Site Configuration](datacenter/multi-site.md)
-4. [Scaling Guide](datacenter/scaling.md)
-
----
-
-## Version Comparison
-
-| Feature | Production | Enterprise | Datacenter |
-|---------|-----------|------------|------------|
-| **License** | Apache 2.0 | BSL 1.1 | BSL 1.1 |
-| **UTC Protocol** | ✅ Complete | ✅ Complete | ✅ Complete |
-| **Time Sync** | ✅ | ✅ | ✅ |
-| **Basic Security** | ✅ | ✅ | ✅ |
-| **Multi-Format Config** | ✅ | ✅ | ✅ |
-| **Hot Reload** | ✅ | ✅ | ✅ |
-| **Web Management** | ❌ | ✅ | ✅ |
-| **REST API** | ❌ | ✅ | ✅ |
-| **SNMP Integration** | ❌ | ✅ | ✅ |
-| **Authentication/RBAC** | ✅ Basic | ✅ Advanced | ✅ Advanced |
-| **Rate Limiting** | ❌ | ✅ | ✅ |
-| **High Availability** | ❌ | ✅ | ✅ |
-| **Clustering** | ❌ | ✅ | ✅ |
-| **Horizontal Scaling** | ❌ | ❌ | ✅ |
-| **Multi-Site Sync** | ❌ | ❌ | ✅ |
-| **Cloud Integration** | ❌ | ❌ | ✅ |
-| **Plugin System** | ❌ | ✅ | ✅ |
-| **Multi-Tenant** | ❌ | ❌ | ✅ |
-
----
 
 ## Documentation by Topic
 

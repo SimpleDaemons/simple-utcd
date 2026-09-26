@@ -19,16 +19,20 @@ enable_console_logging = true
 enable_syslog = false
 
 # Security Configuration
+# RFC 868 has no authentication. Use allow/deny and the rate limit.
 enable_authentication = false
-authentication_key =
+restrict_queries = false
 denied_clients = []
 allowed_clients = []
+enable_rate_limit = true
+rate_limit_rps = 32
+rate_limit_burst = 64
+# Set these when starting as root. systemd can also set User= directly.
+run_as_user =
+run_as_group =
 
 # Performance Configuration
 worker_threads = 2
 enable_statistics = true
 stats_interval = 60
 
-# Development Settings
-debug_mode = false
-verbose_logging = false

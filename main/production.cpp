@@ -1,129 +1,202 @@
-#include <iostream>
-#include <memory>
-#include <thread>
+/**
+ * @file production.cpp
+ * @brief Simple UTC Daemon (RFC 868)
+ * @author SimpleDaemons
+ * @copyright 2024 SimpleDaemons
+ * @license Apache-2.0
+ */
+
+#include "simple-utcd/config/config.hpp"
+#include "simple-utcd/core/server.hpp"
+#include "simple-utcd/utils/error_handler.hpp"
+#include "simple-utcd/utils/logger.hpp"
+#include "simple-utcd/utils/platform.hpp"
+
+#include <atomic>
 #include <chrono>
 #include <csignal>
-#include <atomic>
-#include "simple-utcd/core/server.hpp"
-#include "simple-utcd/config/config.hpp"
-#include "simple-utcd/utils/logger.hpp"
-#include "simple-utcd/utils/error_handler.hpp"
+#include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
 
-// Global variables for signal handling
-static std::atomic<simple_utcd::UTCServer*> g_server_ptr{nullptr};
-static std::atomic<simple_utcd::UTCConfig*> g_config_ptr{nullptr};
-static std::atomic<std::string*> g_config_file_ptr{nullptr};
-static std::atomic<bool> g_reload_requested{false};
-static std::atomic<bool> g_shutdown_requested{false};
+#ifndef SIMPLE_UTCD_VERSION
+#define SIMPLE_UTCD_VERSION "1.0.0"
+#endif
+
+namespace {
+
+std::atomic<bool> g_reload_requested{false};
+std::atomic<bool> g_shutdown_requested{false};
+std::string g_config_file;
 
 void signal_handler(int sig) {
+#ifdef SIGHUP
     if (sig == SIGHUP) {
-        // Request configuration reload
         g_reload_requested = true;
-    } else if (sig == SIGINT || sig == SIGTERM) {
-        // Request graceful shutdown
+        return;
+    }
+#endif
+    if (sig == SIGINT || sig == SIGTERM) {
         g_shutdown_requested = true;
-        auto* server = g_server_ptr.load();
-        if (server) {
-            server->stop();
-        }
     }
 }
 
+void print_usage() {
+    std::cout
+        << "Usage: simple-utcd [OPTIONS] [CONFIG]\n"
+        << "\n"
+        << "RFC 868 time server. Serves the host clock on TCP and UDP port 37.\n"
+        << "Keep the host clock synced with chrony, systemd-timesyncd, or simple-ntpd.\n"
+        << "\n"
+        << "Options:\n"
+        << "  -c, --config FILE    Configuration file\n"
+        << "  --config-test        Load and validate configuration, then exit\n"
+        << "  -h, --help           Show this help\n"
+        << "  -v, --version        Show version\n"
+        << "\n"
+        << "A bare CONFIG path is accepted as well as -c.\n";
+}
+
+void print_version() {
+    std::cout << "simple-utcd " << SIMPLE_UTCD_VERSION << "\n"
+              << "RFC 868 time server\n"
+              << "Licensed under the Apache License 2.0\n";
+}
+
+bool load_config(simple_utcd::UTCConfig& config, const std::string& path, std::string& error) {
+    if (!simple_utcd::Platform::file_exists(path)) {
+        error = "Configuration file not found: " + path;
+        return false;
+    }
+    if (!config.load(path)) {
+        error = "Failed to load configuration file: " + path;
+        return false;
+    }
+    config.load_from_environment();
+    if (!config.validate()) {
+        error = "Configuration validation failed";
+        for (const auto& item : config.get_validation_errors()) {
+            error += "\n  - " + item;
+        }
+        return false;
+    }
+    return true;
+}
+
+std::string default_config_path() {
+    const char* env_config = std::getenv("SIMPLE_UTCD_CONFIG");
+    if (env_config && env_config[0] != '\0') {
+        return env_config;
+    }
+    if (simple_utcd::Platform::file_exists("/etc/simple-utcd/simple-utcd.conf")) {
+        return "/etc/simple-utcd/simple-utcd.conf";
+    }
+    if (simple_utcd::Platform::file_exists("config/simple-utcd.conf")) {
+        return "config/simple-utcd.conf";
+    }
+    return "/etc/simple-utcd/simple-utcd.conf";
+}
+
+}  // namespace
+
 int main(int argc, char* argv[]) {
+    bool config_test = false;
+    std::string config_file;
+
+    for (int i = 1; i < argc; ++i) {
+        const std::string arg = argv[i];
+        if (arg == "-h" || arg == "--help") {
+            print_usage();
+            return 0;
+        }
+        if (arg == "-v" || arg == "--version") {
+            print_version();
+            return 0;
+        }
+        if (arg == "--config-test") {
+            config_test = true;
+            continue;
+        }
+        if (arg == "-c" || arg == "--config") {
+            if (i + 1 >= argc) {
+                std::cerr << "Error: " << arg << " requires a file path\n";
+                return 2;
+            }
+            config_file = argv[++i];
+            continue;
+        }
+        if (!arg.empty() && arg[0] != '-') {
+            config_file = arg;
+            continue;
+        }
+        std::cerr << "Error: unknown option " << arg << "\n";
+        print_usage();
+        return 2;
+    }
+
+    if (config_file.empty()) {
+        config_file = default_config_path();
+    }
+    g_config_file = config_file;
+
     try {
-        // Initialize error handler
         simple_utcd::ErrorHandlerManager::initialize_default();
-
-        // Initialize logger
         auto logger = std::make_unique<simple_utcd::Logger>();
-        logger->info("Simple UTC Daemon starting...");
-
-        // Determine config file path
-        std::string config_file = "config/simple-utcd.conf";
-        if (argc > 1) {
-            config_file = argv[1];
-        } else {
-            // Check environment variable
-            const char* env_config = std::getenv("SIMPLE_UTCD_CONFIG");
-            if (env_config) {
-                config_file = env_config;
-            }
-        }
-        
-        // Load configuration
         auto config = std::make_unique<simple_utcd::UTCConfig>();
-        if (!config->load(config_file)) {
-            logger->error("Failed to load configuration file: {}", config_file);
-            return 1;
-        }
-        
-        // Load environment variables (override config file values)
-        config->load_from_environment();
-        
-        // Validate configuration
-        if (!config->validate()) {
-            logger->error("Configuration validation failed:");
-            for (const auto& error : config->get_validation_errors()) {
-                logger->error("  - {}", error);
+
+        std::string error;
+        if (!load_config(*config, config_file, error)) {
+            if (config_test) {
+                std::cerr << error << "\n";
+                return 1;
             }
+            logger->error(error);
             return 1;
         }
 
-        // Create and start UTC server
+        if (config_test) {
+            std::cout << "Configuration is valid: " << config_file << "\n";
+            return 0;
+        }
+
+        if (!config->get_log_file().empty()) {
+            logger->set_log_file(config->get_log_file());
+        }
+        logger->enable_console(config->is_console_logging_enabled());
+        logger->info("Simple UTC Daemon {} starting", std::string(SIMPLE_UTCD_VERSION));
+
         auto server = std::make_unique<simple_utcd::UTCServer>(config.get(), logger.get());
-        
-        // Set up signal handlers
-        g_server_ptr = server.get();
-        g_config_ptr = config.get();
-        g_config_file_ptr = &config_file;
-        
-        signal(SIGINT, signal_handler);
-        signal(SIGTERM, signal_handler);
-        signal(SIGHUP, signal_handler);
 
-        logger->info("UTC Daemon initialized successfully");
-        logger->info("Listening on {}:{}", config->get_listen_address(), config->get_listen_port());
-        logger->info("Send SIGHUP to reload configuration");
+        std::signal(SIGINT, signal_handler);
+        std::signal(SIGTERM, signal_handler);
+#ifdef SIGHUP
+        std::signal(SIGHUP, signal_handler);
+#endif
 
-        // Start the server
         if (!server->start()) {
             logger->error("Failed to start UTC server");
             return 1;
         }
 
-        // Keep the server running
-        logger->info("UTC Daemon is running. Press Ctrl+C to stop.");
+        logger->info("Listening on {}:{} TCP/UDP", config->get_listen_address(), config->get_listen_port());
+        logger->info("Send SIGHUP to reload configuration");
 
-        // Main loop with config reload support
         while (server->is_running() && !g_shutdown_requested.load()) {
-            // Check for reload request
-            if (g_reload_requested.load()) {
-                g_reload_requested = false;
+            if (g_reload_requested.exchange(false)) {
                 logger->info("Received SIGHUP, reloading configuration...");
-                if (server->reload_config(config_file)) {
-                    logger->info("Configuration reloaded successfully");
-                } else {
+                if (!server->reload_config(g_config_file)) {
                     logger->error("Configuration reload failed, using previous configuration");
                 }
             }
-            
-            // Check for config file changes (if file watching is enabled)
-            if (config->is_file_watching_enabled() && config->check_config_file_changed()) {
-                logger->info("Configuration file changed, reloading...");
-                if (server->reload_config(config_file)) {
-                    logger->info("Configuration reloaded from file change");
-                }
-            }
-            
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        
+
         logger->info("UTC Daemon shutting down...");
         server->stop();
-
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+    } catch (const std::exception& ex) {
+        std::cerr << "Error: " << ex.what() << "\n";
         return 1;
     }
 

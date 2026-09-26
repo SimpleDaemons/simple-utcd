@@ -35,25 +35,6 @@ make
 sudo make install
 ```
 
-### Version-Specific Builds
-
-#### Production Version
-```bash
-cmake -DBUILD_VERSION=production ..
-make
-```
-
-#### Enterprise Version
-```bash
-cmake -DBUILD_VERSION=enterprise ..
-make
-```
-
-#### Datacenter Version
-```bash
-cmake -DBUILD_VERSION=datacenter ..
-make
-```
 
 ---
 

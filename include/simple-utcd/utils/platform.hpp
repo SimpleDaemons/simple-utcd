@@ -55,6 +55,10 @@ public:
     static std::string get_process_name();
     static bool daemonize();
 
+    // Drop root to user/group after privileged binds. No-op when not root
+    // or when user is empty. Returns false if the account cannot be resolved.
+    static bool drop_privileges(const std::string& user, const std::string& group);
+
     // Error handling
     static std::string get_last_error();
     static void set_last_error(const std::string& error);

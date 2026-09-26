@@ -109,6 +109,21 @@ public:
     void set_allowed_clients(const std::vector<std::string>& clients) { allowed_clients_ = clients; }
     void set_denied_clients(const std::vector<std::string>& clients) { denied_clients_ = clients; }
 
+    // Exact IPv4/IPv6 match, plus IPv4 CIDR (for example 10.0.0.0/8).
+    bool is_client_permitted(const std::string& client_address) const;
+
+    bool is_rate_limit_enabled() const { return enable_rate_limit_; }
+    int get_rate_limit_rps() const { return rate_limit_rps_; }
+    int get_rate_limit_burst() const { return rate_limit_burst_; }
+    void set_rate_limit_enabled(bool enabled) { enable_rate_limit_ = enabled; }
+    void set_rate_limit_rps(int rps) { rate_limit_rps_ = rps; }
+    void set_rate_limit_burst(int burst) { rate_limit_burst_ = burst; }
+
+    const std::string& get_run_as_user() const { return run_as_user_; }
+    const std::string& get_run_as_group() const { return run_as_group_; }
+    void set_run_as_user(const std::string& user) { run_as_user_ = user; }
+    void set_run_as_group(const std::string& group) { run_as_group_ = group; }
+
     // Performance Configuration
     int get_worker_threads() const { return worker_threads_; }
     int get_max_packet_size() const { return max_packet_size_; }
@@ -147,6 +162,11 @@ private:
     bool restrict_queries_;
     std::vector<std::string> allowed_clients_;
     std::vector<std::string> denied_clients_;
+    bool enable_rate_limit_;
+    int rate_limit_rps_;
+    int rate_limit_burst_;
+    std::string run_as_user_;
+    std::string run_as_group_;
 
     // Performance Configuration
     int worker_threads_;

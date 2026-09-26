@@ -22,7 +22,9 @@
 #include <memory>
 #include <fstream>
 #include <mutex>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 
 namespace simple_utcd {
 
@@ -59,22 +61,22 @@ public:
 
     template<typename... Args>
     void debug(const std::string& format, Args&&... args) {
-        log(LogLevel::DEBUG, format, std::forward<Args>(args)...);
+        log(LogLevel::DEBUG, render(format, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     void info(const std::string& format, Args&&... args) {
-        log(LogLevel::INFO, format, std::forward<Args>(args)...);
+        log(LogLevel::INFO, render(format, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     void warn(const std::string& format, Args&&... args) {
-        log(LogLevel::WARN, format, std::forward<Args>(args)...);
+        log(LogLevel::WARN, render(format, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     void error(const std::string& format, Args&&... args) {
-        log(LogLevel::ERROR, format, std::forward<Args>(args)...);
+        log(LogLevel::ERROR, render(format, std::forward<Args>(args)...));
     }
 
 private:
@@ -92,11 +94,32 @@ private:
 
     void log(LogLevel level, const std::string& message);
 
-        template<typename... Args>
-    void log(LogLevel level, const std::string& format, Args&&... args) {
-        // For now, just log the format string without formatting
-        // TODO: Implement proper string formatting
-        log(level, format);
+    template<typename T>
+    static void append_formatted(std::string& message, T&& value) {
+        std::ostringstream rendered;
+        rendered << std::forward<T>(value);
+        const auto pos = message.find("{}");
+        if (pos == std::string::npos) {
+            if (!message.empty() && message.back() != ' ') {
+                message.push_back(' ');
+            }
+            message += rendered.str();
+            return;
+        }
+        message.replace(pos, 2, rendered.str());
+    }
+
+    template<typename T, typename... Rest>
+    static void append_formatted(std::string& message, T&& value, Rest&&... rest) {
+        append_formatted(message, std::forward<T>(value));
+        append_formatted(message, std::forward<Rest>(rest)...);
+    }
+
+    template<typename... Args>
+    static std::string render(const std::string& format, Args&&... args) {
+        std::string message = format;
+        append_formatted(message, std::forward<Args>(args)...);
+        return message;
     }
 
     std::string level_to_string(LogLevel level);

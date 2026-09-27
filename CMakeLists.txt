@@ -182,7 +182,7 @@ if(ENABLE_PACKAGING)
         set(CPACK_WIX_PROPERTY_ARPHELPLINK "https://github.com/simpledaemons/${PROJECT_NAME}")
         set(CPACK_WIX_PROPERTY_ARPURLINFOABOUT "https://github.com/simpledaemons/${PROJECT_NAME}")
         set(CPACK_WIX_PROPERTY_ARPNOREPAIR "1")
-        set(CPACK_WIX_PROPERTY_ARPNOMODIFY "1")
+        # WixUI_InstallDir already defines ARPNOMODIFY. Setting it again fails light.exe.
         
         # ZIP package settings
         set(CPACK_ZIP_COMPONENT_INSTALL ON)

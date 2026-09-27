@@ -23,6 +23,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#undef ERROR
 #else
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -206,8 +207,15 @@ int ACLManager::compare_rules(const ACLRule& a, const ACLRule& b) const {
     parse_cidr(b.network, b_network, b_mask);
     
     // Count set bits in mask (prefix length)
-    int a_prefix = __builtin_popcount(ntohl(a_mask));
-    int b_prefix = __builtin_popcount(ntohl(b_mask));
+    const auto prefix_length = [](uint32_t mask) {
+        int bits = 0;
+        for (uint32_t value = ntohl(mask); value != 0; value >>= 1) {
+            bits += static_cast<int>(value & 1u);
+        }
+        return bits;
+    };
+    const int a_prefix = prefix_length(a_mask);
+    const int b_prefix = prefix_length(b_mask);
     
     if (a_prefix != b_prefix) {
         return a_prefix - b_prefix;  // Smaller prefix (more specific) first

@@ -22,6 +22,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#undef ERROR
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -320,7 +321,7 @@ bool UpstreamManager::perform_health_check(UpstreamServer& server) {
 
 uint64_t UpstreamManager::measure_response_time(const std::string& address, int port) {
     // Simple TCP connect test
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    const int sock = static_cast<int>(socket(AF_INET, SOCK_STREAM, 0));
     if (sock < 0) {
         return 0;
     }

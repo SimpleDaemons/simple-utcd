@@ -40,6 +40,7 @@
 #include <shlobj.h>
 #include <process.h>
 #pragma comment(lib, "ws2_32.lib")
+#undef ERROR
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -113,7 +114,7 @@ int Platform::create_socket(int domain, int type, int protocol) {
     }
 #endif
 
-    int sock = socket(domain, type, protocol);
+    const int sock = static_cast<int>(socket(domain, type, protocol));
     if (sock < 0) {
 #ifdef _WIN32
         last_error_ = "socket() failed: " + std::to_string(WSAGetLastError());
@@ -198,7 +199,7 @@ int Platform::accept_connection(int socket_fd, std::string& client_address) {
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
 
-    int client_fd = accept(socket_fd, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
+    const int client_fd = static_cast<int>(accept(socket_fd, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len));
     if (client_fd < 0) {
 #ifdef _WIN32
         last_error_ = "accept() failed: " + std::to_string(WSAGetLastError());

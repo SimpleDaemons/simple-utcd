@@ -20,6 +20,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <BaseTsd.h>
+#undef ERROR
 #else
 #include <unistd.h>
 #include <sys/socket.h>

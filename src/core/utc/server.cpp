@@ -249,7 +249,7 @@ void UTCServer::accept_loop(int fd) {
 
         sockaddr_storage client_addr{};
         socklen_t client_len = sizeof(client_addr);
-        int client_fd = ::accept(fd, reinterpret_cast<sockaddr*>(&client_addr), &client_len);
+        const int client_fd = static_cast<int>(::accept(fd, reinterpret_cast<sockaddr*>(&client_addr), &client_len));
         if (client_fd < 0) {
             if (running_) {
                 UTC_ERROR("UTCServer", "Failed to accept connection: " + Platform::get_last_error());
@@ -405,7 +405,8 @@ void UTCServer::send_udp_reply(int fd, const sockaddr* address, socklen_t addres
 
     UTCPacket packet(get_utc_timestamp());
     const std::vector<uint8_t> bytes = packet.to_bytes();
-    const ssize_t sent = ::sendto(fd, reinterpret_cast<const char*>(bytes.data()), bytes.size(), 0,
+    const ssize_t sent = ::sendto(fd, reinterpret_cast<const char*>(bytes.data()),
+                                  static_cast<int>(bytes.size()), 0,
                                   address, address_len);
     if (sent == static_cast<ssize_t>(bytes.size())) {
         packets_sent_++;

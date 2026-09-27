@@ -46,16 +46,19 @@ Logger::Logger()
     , max_log_files_(5)
     , current_log_size_(0)
 {
-    // Initialize syslog if enabled
+#ifndef _WIN32
     if (syslog_enabled_) {
         openlog("simple-utcd", LOG_PID | LOG_CONS, LOG_DAEMON);
     }
+#endif
 }
 
 Logger::~Logger() {
+#ifndef _WIN32
     if (syslog_enabled_) {
         closelog();
     }
+#endif
 
     if (file_stream_ && file_stream_->is_open()) {
         file_stream_->close();

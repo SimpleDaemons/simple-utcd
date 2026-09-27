@@ -28,6 +28,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <BaseTsd.h>
+#undef ERROR
 using ssize_t = SSIZE_T;
 #else
 #include <unistd.h>
@@ -81,7 +82,7 @@ bool UTCConnection::send_packet(const UTCPacket& packet) {
     }
 
     packets_sent_++;
-    bytes_sent_ += data.size();
+    bytes_sent_ += static_cast<int>(data.size());
 
     if (logger_) {
         logger_->debug("Sent UTC packet to {}: {}", client_address_, packet.to_string());
@@ -111,7 +112,7 @@ bool UTCConnection::receive_packet(UTCPacket& packet) {
     }
 
     packets_received_++;
-    bytes_received_ += data.size();
+    bytes_received_ += static_cast<int>(data.size());
 
     if (logger_) {
         logger_->debug("Received packet from {}: {}", client_address_, packet.to_string());

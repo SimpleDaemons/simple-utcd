@@ -25,6 +25,7 @@
 #include <cstring>
 #ifdef _WIN32
 #include <winsock2.h>
+#undef ERROR
 #else
 #include <unistd.h>
 #endif

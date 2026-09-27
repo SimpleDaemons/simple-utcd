@@ -8,6 +8,7 @@
 
 #include "simple-utcd/config/config.hpp"
 #include "simple-utcd/core/server.hpp"
+#include "simple-utcd/platform/windows_service.hpp"
 #include "simple-utcd/utils/error_handler.hpp"
 #include "simple-utcd/utils/logger.hpp"
 #include "simple-utcd/utils/platform.hpp"
@@ -55,6 +56,7 @@ void print_usage() {
         << "  --config-test        Load and validate configuration, then exit\n"
         << "  -h, --help           Show this help\n"
         << "  -v, --version        Show version\n"
+        << "  service              Windows service install, status, or uninstall\n"
         << "\n"
         << "A bare CONFIG path is accepted as well as -c.\n";
 }
@@ -99,9 +101,11 @@ std::string default_config_path() {
     return "/etc/simple-utcd/simple-utcd.conf";
 }
 
+void request_shutdown() { g_shutdown_requested = true; }
+
 }  // namespace
 
-int main(int argc, char* argv[]) {
+static int run_application(int argc, char* argv[]) {
     bool config_test = false;
     std::string config_file;
 
@@ -201,4 +205,13 @@ int main(int argc, char* argv[]) {
     }
 
     return 0;
+}
+
+int main(int argc, char* argv[]) {
+    int exit_code = 0;
+    if (simple_utcd::windows_service_entry(argc, argv, exit_code,
+                                           request_shutdown, run_application)) {
+        return exit_code;
+    }
+    return run_application(argc, argv);
 }

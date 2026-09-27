@@ -55,7 +55,9 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE SIMPLE_UTCD_VERSION="${PROJEC
 # Link libraries
 target_link_libraries(${PROJECT_NAME} Threads::Threads)
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} ws2_32)
+    target_link_libraries(${PROJECT_NAME} ws2_32 advapi32)
+    target_sources(${PROJECT_NAME} PRIVATE
+        deployment/windows/windows_service.cpp)
 endif()
 
 if(ENABLE_SSL)
@@ -183,6 +185,7 @@ if(ENABLE_PACKAGING)
         set(CPACK_WIX_PROPERTY_ARPURLINFOABOUT "https://github.com/simpledaemons/${PROJECT_NAME}")
         set(CPACK_WIX_PROPERTY_ARPNOREPAIR "1")
         # WixUI_InstallDir already defines ARPNOMODIFY. Setting it again fails light.exe.
+        set(CPACK_WIX_PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/wix-service.xml")
         
         # ZIP package settings
         set(CPACK_ZIP_COMPONENT_INSTALL ON)
